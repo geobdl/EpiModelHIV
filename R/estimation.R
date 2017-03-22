@@ -558,3 +558,157 @@ make_nw_het <- function(n = 10000,
 
   return(out)
 }
+
+
+
+# MSM-Het -------------------------------------------------------------
+
+#' @title Add Heterosexual Target Statistics for Network Model Estimation
+#'
+#' @description Calculates the target statistics for the formation and dissolution
+#'              components of the network model to be estimated with \code{netest}.
+#'
+#' @param nwstats
+#' @param ...
+#'
+#' @export
+add_nwstats_het <- function(nwstats,
+                            num.B.het = 9000,
+                            num.W.het = 9000,
+                            male.prop = 0.5,
+                            msmw.prop = 0.5,
+                            ...) {
+
+  nwstats$num.B.het <- num.B.het
+  nwstats$num.W.het <- num.W.het
+  nwstats$male.prop <- male.prop
+  nwstats$msmw.prop <- msmw.prop
+
+  return(nwstats)
+}
+
+
+#' @title Construct Base Network for Model Estimation and Simulation
+#' @description Initializes the base network for model estimation within
+#'              \code{netest}.
+#' @inheritParams base_nw_msm
+#' @export
+base_nw_msm_het <- function(nwstats) {
+
+  num.B.msm <- nwstats$num.B
+  num.W.msm <- nwstats$num.W
+  num.B.het <- nwstats$num.B.het
+  num.W.het <- nwstats$num.W.het
+
+  # Initialize network
+  n <- num.B.msm + num.W.msm + num.B.het + num.W.het
+  nw <- network::network.initialize(n, directed = FALSE)
+
+  # Calculate attributes
+  male <- sample(apportion_lr(n, 0:1, nwstats$male.prop))
+
+  ## Create an fixed MSM class variable:
+  ##  0 = MSM
+  ##  1 = MSMW
+  ##  2 = MSW
+  ##  4 = W
+  msm.class <- rep(NA, n)
+  msm.class[male == 0] <- 4
+
+  msw.size <- num.B.het + num.W.het - sum(male == 0)
+  ids.male <- which(male == 1)
+  msw <- sample(ids.male, msw.size)
+  msm.class[msw] <- 3
+
+  msm.msmw <- which(is.na(msm.class))
+  msm.class[msm.msmw] <- sample(apportion_lr(length(msm.msmw), 1:2,
+                                             c(1-nwstats$msmw.prop, nwstats$msmw.prop)))
+  # table(msm.class, male)
+
+  race <- c(rep("B", num.B.msm + num.B.het), rep("W", num.W.msm + num.W.het))
+  race <- sample(race)
+
+  ager <- nwstats$ages
+  ages <- seq(min(ager), max(ager) + 1, 1 / (365 / nwstats$time.unit))
+  age <- sample(ages, n, TRUE)
+  sqrt.age <- sqrt(age)
+
+  role.B <- sample(apportion_lr(sum(msm.class %in% 1:2 & race == "B"),
+                                c("I", "R", "V"), nwstats$role.B.prob))
+  role.W <- sample(apportion_lr(sum(msm.class %in% 1:2 & race == "W"),
+                                c("I", "R", "V"), nwstats$role.W.prob))
+  role <- rep(NA, n)
+  role[msm.class %in% 1:2 & race == "B"] <- role.B
+  role[msm.class %in% 1:2 & race == "W"] <- role.W
+  # table(msm.class, role)
+
+  riskg.B <- sample(apportion_lr(sum(msm.class %in% 1:2 & race == "B"),
+                                 1:5, rep(0.2, 5)))
+  riskg.W <- sample(apportion_lr(sum(msm.class %in% 1:2 & race == "W"),
+                                 1:5, rep(0.2, 5)))
+  riskg <- rep(NA, n)
+  riskg[msm.class %in% 1:2 & race == "B"] <- paste0("B", riskg.B)
+  riskg[msm.class %in% 1:2 & race == "W"] <- paste0("W", riskg.W)
+  # table(msm.class, riskg)
+
+  attr.names <- c("race", "riskg", "sqrt.age", "role.class", "male", "msm.class")
+  attr.values <- list(race, riskg, sqrt.age, role, male, msm.class)
+  nw <- network::set.vertex.attribute(nw, attr.names, attr.values)
+
+  return(nw)
+}
+
+#' @title Assign Degree Vertex Attribute on Network Objects
+#'
+#' @description Assigns the degree vertex attributes on network objects
+#'              conditional on their values from the other networks.
+#'
+#' @inheritParams assign_degree
+#'
+#' @export
+assign_degree_msmhet <- function(nw, deg.type, nwstats) {
+
+  if (!("network" %in% class(nw))) {
+    stop("nw must be of class network")
+  }
+
+  if (deg.type == "main") {
+    attr.name <- "deg.main"
+    dist.B <- rowSums(nwstats$deg.mp.B)
+    dist.W <- rowSums(nwstats$deg.mp.W)
+  }
+  if (deg.type == "pers") {
+    attr.name <- "deg.pers"
+    dist.B <- colSums(nwstats$deg.mp.B)
+    dist.W <- colSums(nwstats$deg.mp.W)
+  }
+
+  if (!isTRUE(all.equal(sum(colSums(nwstats$deg.mp.B)), 1, tolerance = 5e-6))) {
+    stop("B degree distributions do not sum to 1")
+  }
+
+  if (!isTRUE(all.equal(sum(colSums(nwstats$deg.mp.W)), 1, tolerance = 5e-6))) {
+    stop("W degree distributions do not sum to 1")
+  }
+
+  race <- get.vertex.attribute(nw, "race")
+  msm.class <- get.vertex.attribute(nw, "msm.class")
+  vB <- which(race == "B" & msm.class %in% 1:2)
+  vW <- which(race == "W" & msm.class %in% 1:2)
+  nB <- length(vB)
+  nW <- length(vW)
+
+  num.degrees.B <- length(dist.B)
+  num.degrees.W <- length(dist.W)
+
+  deg.B <- apportion_lr(nB, 0:(num.degrees.B - 1), dist.B, shuffled = TRUE)
+  deg.W <- apportion_lr(nW, 0:(num.degrees.W - 1), dist.W, shuffled = TRUE)
+
+  deg.B <- paste0("B", deg.B)
+  deg.W <- paste0("W", deg.W)
+
+  nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.B, v = vB)
+  nw <- set.vertex.attribute(nw, attrname = attr.name, value = deg.W, v = vW)
+
+  return(nw)
+}

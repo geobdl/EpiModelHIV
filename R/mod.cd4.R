@@ -138,3 +138,26 @@ expected_cd4 <- function(method, cd4Count1, cd4Count2,
   }
 
 }
+
+#' @title CD4 Progression Module (DCM Version)
+#'
+#' @description Module function for simulating progression of CD4 following broad
+#'              compartment transitions.
+#'
+#' @inheritParams aging_het
+#'
+#' @keywords module het
+#'
+#' @export
+#'
+cd4_het_dcm <- function(dat, at) {
+
+  status <- dat$attr$status
+  time.unit <- dat$param$time.unit
+
+  if (is.null(dat$attr$cd4Count)) {
+    dat$attr$cd4Grp <- rep(NA, length(status))
+  }
+  cd4Grp <- dat$attr$cd4Grp
+
+}
