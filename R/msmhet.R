@@ -210,20 +210,24 @@ param_msmhet <- function(nwstats,
 
 #' @export
 init_msmhet <- function(nwstats,
-                     prev.B = 0.15,
-                     prev.W = 0.15,
+                     prev.B.male = 0.15,
+                     prev.W.male = 0.15,
+                     prev.B.feml = 0.01,
+                     prev.W.feml = 0.01,
                      ...) {
 
   p <- get_args(formal.args = formals(sys.function()),
                 dot.args = list(...))
 
-  p$num.B <- nwstats$num.B
-  p$num.W <- nwstats$num.W
+  p$num.B <- nwstats$num.B + nwstats$num.B.het
+  p$num.W <- nwstats$num.W + nwstats$num.W.het
 
   p$ages <- nwstats$ages
 
-  p$init.prev.age.slope.B <- prev.B / 12
-  p$init.prev.age.slope.W <- prev.W / 12
+  p$init.prev.age.slope.B.male <- 0.05 / 12
+  p$init.prev.age.slope.W.male <- 0.05 / 12
+  p$init.prev.age.slope.B.feml <- 0.05 / 12
+  p$init.prev.age.slope.W.feml <- 0.05 / 12
 
   p$nwstats <- NULL
 
@@ -244,7 +248,7 @@ control_msmhet <- function(simno = 1,
                         births.FUN = births_msm,
                         test.FUN = test_msm,
                         tx.FUN = tx_msm,
-                        prep.FUN = prep_msm,
+                        prep.FUN = NULL,
                         progress.FUN = progress_msm,
                         vl.FUN = vl_msm,
                         aiclass.FUN = NULL,
@@ -253,7 +257,7 @@ control_msmhet <- function(simno = 1,
                         disclose.FUN = disclose_msm,
                         acts.FUN = acts_msm,
                         condoms.FUN = condoms_msm,
-                        riskhist.FUN = riskhist_msm,
+                        riskhist.FUN = NULL,
                         position.FUN = position_msm,
                         trans.FUN = trans_msm,
                         prev.FUN = prevalence_msm,
@@ -335,15 +339,13 @@ initialize_msmhet <- function(x, param, init, control, s) {
 
   ## Nodal attributes ##
 
-  # Degree terms
-  dat$attr$deg.pers <- get.vertex.attribute(x[[1]]$fit$network, "deg.pers")
-  dat$attr$deg.main <- get.vertex.attribute(x[[2]]$fit$network, "deg.main")
-
+  # Male
+  dat$attr$male <- get.vertex.attribute(nw[[1]], "male")
 
   # Race
   dat$attr$race <- get.vertex.attribute(nw[[1]], "race")
-  num.B <- dat$init$num.B
-  num.W <- dat$init$num.W
+  num.B <- sum(dat$attr$race == "B")
+  num.W <- sum(dat$attr$race == "W")
   num <- num.B + num.W
   ids.B <- which(dat$attr$race == "B")
   ids.W <- which(dat$attr$race == "W")
@@ -371,9 +373,12 @@ initialize_msmhet <- function(x, param, init, control, s) {
   dat$attr$arrival.time <- rep(1, num)
 
   # Circumcision
+  idsMale.B <- which(dat$attr$male == 1 & dat$attr$race == "B")
+  idsMale.W <- which(dat$attr$male == 1 & dat$attr$race == "W")
+
   circ <- rep(NA, num)
-  circ[ids.B] <- sample(apportion_lr(num.B, 0:1, 1 - param$circ.B.prob))
-  circ[ids.W] <- sample(apportion_lr(num.W, 0:1, 1 - param$circ.W.prob))
+  circ[idsMale.B] <- sample(apportion_lr(length(idsMale.B), 0:1, 1 - param$circ.B.prob))
+  circ[idsMale.W] <- sample(apportion_lr(length(idsMale.W), 0:1, 1 - param$circ.W.prob))
   dat$attr$circ <- circ
 
   # PrEP Attributes
@@ -381,12 +386,9 @@ initialize_msmhet <- function(x, param, init, control, s) {
   dat$attr$prepElig <- rep(NA, num)
   dat$attr$prepStat <- rep(0, num)
 
-  # One-off AI class
-  inst.ai.class <- rep(NA, num)
-  ncl <- param$num.inst.ai.classes
-  inst.ai.class[ids.B] <- sample(apportion_lr(num.B, 1:ncl, rep(1 / ncl, ncl)))
-  inst.ai.class[ids.W] <- sample(apportion_lr(num.W, 1:ncl, rep(1 / ncl, ncl)))
-  dat$attr$inst.ai.class <- inst.ai.class
+  # MSM class
+  msm.class <- get.vertex.attribute(nw[[1]], "msm.class")
+  dat$attr$msm.class <- msm.class
 
   # Role class
   role.class <- get.vertex.attribute(nw[[1]], "role.class")
@@ -394,20 +396,16 @@ initialize_msmhet <- function(x, param, init, control, s) {
 
   # Ins.quot
   ins.quot <- rep(NA, num)
-  ins.quot[role.class == "I"]  <- 1
-  ins.quot[role.class == "R"]  <- 0
-  ins.quot[role.class == "V"]  <- runif(sum(role.class == "V"))
+  ins.quot[which(role.class == "I")]  <- 1
+  ins.quot[which(role.class == "R")]  <- 0
+  ins.quot[which(role.class == "V")]  <- runif(sum(role.class == "V", na.rm = TRUE))
   dat$attr$ins.quot <- ins.quot
 
   # HIV-related attributes
-  dat <- init_status_msm(dat)
+  dat <- init_status_msmhet(dat)
 
   # CCR5
-  dat <- init_ccr5_msm(dat)
-
-
-  # Network statistics
-  dat$stats$nwstats <- list()
+  dat <- init_ccr5_msmhet(dat)
 
 
   # Prevalence Tracking
@@ -421,7 +419,7 @@ initialize_msmhet <- function(x, param, init, control, s) {
 
   }
 
-  dat <- prevalence_msm(dat, at = 1)
+  dat <- prevalence_msmhet(dat, at = 1)
 
   class(dat) <- "dat"
   return(dat)
@@ -431,54 +429,64 @@ initialize_msmhet <- function(x, param, init, control, s) {
 #' @export
 init_status_msmhet <- function(dat) {
 
-  num.B <- dat$init$num.B
-  num.W <- dat$init$num.W
-  num <- num.B + num.W
-  ids.B <- which(dat$attr$race == "B")
-  ids.W <- which(dat$attr$race == "W")
-  age <- dat$attr$age
   race <- dat$attr$race
+  male <- dat$attr$male
+
+  num.B.male <- sum(race == "B" & male == 1)
+  num.W.male <- sum(race == "W" & male == 1)
+  num.B.feml <- sum(race == "B" & male == 0)
+  num.W.feml <- sum(race == "W" & male == 0)
+
+  ids.B.male <- which(race == "B" & male == 1)
+  ids.W.male <- which(race == "W" & male == 1)
+  ids.B.feml <- which(race == "B" & male == 0)
+  ids.W.feml <- which(race == "W" & male == 0)
+
+  num.B <- sum(race == "B")
+  num.W <- sum(race == "W")
+  ids.B <- union(ids.B.male, ids.B.feml)
+  ids.W <- union(ids.B.feml, ids.W.feml)
+
+  num <- length(race)
+  age <- dat$attr$age
 
   # Infection Status
-  nInfB <- round(dat$init$prev.B * num.B)
-  nInfW <- round(dat$init$prev.W * num.W)
+  nInfB.male <- round(dat$init$prev.B.male * num.B.male)
+  nInfW.male <- round(dat$init$prev.W.male * num.W.male)
+  nInfB.feml <- round(dat$init$prev.B.feml * num.B.feml)
+  nInfW.feml <- round(dat$init$prev.W.feml * num.W.feml)
 
-  # Age-based infection probability
-  probInfCrB <- age[ids.B] * dat$init$init.prev.age.slope.B
-  probInfB <- probInfCrB + (nInfB - sum(probInfCrB)) / num.B
-
-  probInfCrW <- age[ids.W] * dat$init$init.prev.age.slope.W
-  probInfW <- probInfCrW + (nInfW - sum(probInfCrW)) / num.W
-
-  if (any(probInfB <= 0) | any(probInfW <= 0)) {
-    stop("Slope of initial prevalence by age must be sufficiently low to ",
-         "avoid non-positive probabilities.", call. = FALSE)
-  }
+  # Infection probability
+  probInfB.male <- dat$init$prev.B.male
+  probInfW.male <- dat$init$prev.W.male
+  probInfB.feml <- dat$init$prev.B.feml
+  probInfW.feml <- dat$init$prev.W.feml
 
   # Infection status
   status <- rep(0, num)
-  while (sum(status[ids.B]) != nInfB) {
-    status[ids.B] <- rbinom(num.B, 1, probInfB)
+  while (sum(status[ids.B.male]) != nInfB.male) {
+    status[ids.B.male] <- rbinom(num.B.male, 1, probInfB.male)
   }
-  while (sum(status[ids.W]) != nInfW) {
-    status[ids.W] <- rbinom(num.W, 1, probInfW)
+  while (sum(status[ids.W.male]) != nInfW.male) {
+    status[ids.W.male] <- rbinom(num.W.male, 1, probInfW.male)
+  }
+  while (sum(status[ids.B.feml]) != nInfB.feml) {
+    status[ids.B.feml] <- rbinom(num.B.feml, 1, probInfB.feml)
+  }
+  while (sum(status[ids.W.feml]) != nInfW.feml) {
+    status[ids.W.feml] <- rbinom(num.W.feml, 1, probInfW.feml)
   }
   dat$attr$status <- status
-
 
   # Treatment trajectory
   tt.traj <- rep(NA, num)
 
-  tt.traj[ids.B] <- sample(apportion_lr(num.B, c(1, 2, 3, 4),
-                                        dat$param$tt.traj.B.prob))
-  tt.traj[ids.W] <- sample(apportion_lr(num.W, c(1, 2, 3, 4),
-                                        dat$param$tt.traj.W.prob))
+  tt.traj[ids.B] <- sample(apportion_lr(num.B, 1:4, dat$param$tt.traj.B.prob))
+  tt.traj[ids.W] <- sample(apportion_lr(num.W, 1:4, dat$param$tt.traj.W.prob))
   dat$attr$tt.traj <- tt.traj
 
 
-
   ## Infection-related attributes
-
   stage <- rep(NA, num)
   stage.time <- rep(NA, num)
   inf.time <- rep(NA, num)
@@ -490,12 +498,6 @@ init_status_msmhet <- function(dat) {
   tx.init.time <- rep(NA, num)
   cum.time.on.tx <- rep(NA, num)
   cum.time.off.tx <- rep(NA, num)
-  infector <- rep(NA, num)
-  inf.role <- rep(NA, num)
-  inf.type <- rep(NA, num)
-  inf.diag <- rep(NA, num)
-  inf.tx <- rep(NA, num)
-  inf.stage <- rep(NA, num)
 
   time.sex.active <- pmax(1,
                           round((365 / dat$param$time.unit) * age - (365 / dat$param$time.unit) *
@@ -834,12 +836,6 @@ init_status_msmhet <- function(dat) {
   dat$attr$tx.init.time <- tx.init.time
   dat$attr$cum.time.on.tx <- cum.time.on.tx
   dat$attr$cum.time.off.tx <- cum.time.off.tx
-  dat$attr$infector <- infector
-  dat$attr$inf.role <- inf.role
-  dat$attr$inf.type <- inf.type
-  dat$attr$inf.diag <- inf.diag
-  dat$attr$inf.tx <- inf.tx
-  dat$attr$inf.stage <- inf.stage
 
   return(dat)
 
@@ -849,10 +845,10 @@ init_status_msmhet <- function(dat) {
 #' @export
 init_ccr5_msmhet <- function(dat) {
 
-  num.B <- dat$init$num.B
-  num.W <- dat$init$num.W
-  num <- num.B + num.W
   race <- dat$attr$race
+  num.B <- sum(race == "B")
+  num.W <- sum(race == "W")
+  num <- num.B + num.W
   status <- dat$attr$status
 
   nInfB <- sum(race == "B" & status == 1)
@@ -1114,10 +1110,6 @@ setBirthAttr_msmhet <- function(dat, at, nBirths.B, nBirths.W) {
                                         prob = c(1 - sum(ccr5.W.prob),
                                                  ccr5.W.prob[2], ccr5.W.prob[1]))
 
-
-  # Degree
-  dat$attr$deg.main[newIds] <- 0
-  dat$attr$deg.pers[newIds] <- 0
 
   # One-off risk group
   dat$attr$riskg[newIds] <- sample(1:5, nBirths, TRUE)
@@ -1487,11 +1479,6 @@ simnet_msmhet <- function(dat, at) {
   ## Main network
   nwparam.m <- EpiModel::get_nwparam(dat, network = 1)
 
-  if (dat$param$method == 1) {
-    dat$attr$deg.pers <- get_degree(dat$el[[2]])
-  } else {
-    dat$attr$deg.pers <- paste0(dat$attr$race, get_degree(dat$el[[2]]))
-  }
   dat <- tergmLite::updateModelTermInputs(dat, network = 1)
 
   dat$el[[1]] <- tergmLite::simulate_network(p = dat$p[[1]],
@@ -1513,11 +1500,6 @@ simnet_msmhet <- function(dat, at) {
   ## Casual network
   nwparam.p <- EpiModel::get_nwparam(dat, network = 2)
 
-  if (dat$param$method == 1) {
-    dat$attr$deg.main <- get_degree(dat$el[[1]])
-  } else {
-    dat$attr$deg.main <- paste0(dat$attr$race, get_degree(dat$el[[1]]))
-  }
   dat <- tergmLite::updateModelTermInputs(dat, network = 2)
 
   dat$el[[2]] <- tergmLite::simulate_network(p = dat$p[[2]],
@@ -1539,11 +1521,6 @@ simnet_msmhet <- function(dat, at) {
   ## One-off network
   nwparam.i <- EpiModel::get_nwparam(dat, network = 3)
 
-  if (dat$param$method == 1) {
-    dat$attr$deg.pers <- get_degree(dat$el[[2]])
-  } else {
-    dat$attr$deg.pers <- paste0(dat$attr$race, get_degree(dat$el[[2]]))
-  }
   dat <- tergmLite::updateModelTermInputs(dat, network = 3)
 
   dat$el[[3]] <- tergmLite::simulate_ergm(p = dat$p[[3]],
@@ -1866,11 +1843,6 @@ condoms_msmhet <- function(dat, at) {
       ca1 <- cond.always[elt[, 1]]
       ca2 <- cond.always[elt[, 2]]
       uai.prob <- ifelse(ca1 == 1 | ca2 == 1, 0, uai.prob)
-      if (type == "pers") {
-        dat$epi$cprob.always.pers[at] <- mean(uai.prob == 0)
-      } else {
-        dat$epi$cprob.always.inst[at] <- mean(uai.prob == 0)
-      }
     }
 
     ai.vec <- elt[, "ai"]
@@ -2090,20 +2062,11 @@ trans_msmhet <- function(dat, at){
 
   # Update attributes
 
-  infected <- infector <- inf.type <- NULL
+  infected <- NULL
   if (sum(trans.ip, trans.rp) > 0) {
 
     infected <- c(disc.ip[trans.ip == 1, 2],
                   disc.rp[trans.rp == 1, 1])
-    infector <- c(disc.ip[trans.ip == 1, 1],
-                  disc.rp[trans.rp == 1, 2])
-    inf.role <- c(rep(0, sum(trans.ip)), rep(1, sum(trans.rp)))
-    inf.type <- c(disc.ip[trans.ip == 1, "ptype"],
-                  disc.rp[trans.rp == 1, "ptype"])
-
-    inf.stage <- stage[infector]
-    inf.diag <- diag.status[infector]
-    inf.tx <- tx.status[infector]
 
     dat$attr$status[infected] <- 1
     dat$attr$inf.time[infected] <- at
@@ -2112,13 +2075,6 @@ trans_msmhet <- function(dat, at){
     dat$attr$stage.time[infected] <- 0
     dat$attr$diag.status[infected] <- 0
     dat$attr$tx.status[infected] <- 0
-
-    dat$attr$infector[infected] <- infector
-    dat$attr$inf.role[infected] <- inf.role
-    dat$attr$inf.type[infected] <- inf.type
-    dat$attr$inf.diag[infected] <- inf.diag
-    dat$attr$inf.tx[infected] <- inf.tx
-    dat$attr$inf.stage[infected] <- inf.stage
 
     dat$attr$cum.time.on.tx[infected] <- 0
     dat$attr$cum.time.off.tx[infected] <- 0
@@ -2137,7 +2093,7 @@ prevalence_msmhet <- function(dat, at) {
 
   race <- dat$attr$race
   status <- dat$attr$status
-  prepStat <- dat$attr$prepStat
+  male <- dat$attr$male
 
   nsteps <- dat$control$nsteps
   rNA <- rep(NA, nsteps)
@@ -2146,56 +2102,39 @@ prevalence_msmhet <- function(dat, at) {
     dat$epi$num <- rNA
     dat$epi$num.B <- rNA
     dat$epi$num.W <- rNA
-    dat$epi$s.num <- rNA
+    dat$epi$num.B.male <- rNA
+    dat$epi$num.W.male <- rNA
+    dat$epi$num.B.feml <- rNA
+    dat$epi$num.W.feml <- rNA
     dat$epi$i.num <- rNA
     dat$epi$i.num.B <- rNA
     dat$epi$i.num.W <- rNA
-    dat$epi$i.prev <- rNA
-    dat$epi$i.prev.B <- rNA
-    dat$epi$i.prev.W <- rNA
+    dat$epi$i.num.B.male <- rNA
+    dat$epi$i.num.W.male <- rNA
+    dat$epi$i.num.B.feml <- rNA
+    dat$epi$i.num.W.feml <- rNA
+
     dat$epi$nBirths <- rNA
     dat$epi$dth.gen <- rNA
     dat$epi$dth.dis <- rNA
+
     dat$epi$incid <- rNA
-
-    dat$epi$prepCurr <- rNA
-    dat$epi$prepCov <- rNA
-    dat$epi$prepElig <- rNA
-    dat$epi$prepStart <- rNA
-    dat$epi$incid.prep0 <- rNA
-    dat$epi$incid.prep1 <- rNA
-    dat$epi$i.num.prep0 <- rNA
-    dat$epi$i.num.prep1 <- rNA
-
-    dat$epi$cprob.always.pers <- rNA
-    dat$epi$cprob.always.inst <- rNA
   }
-
 
   dat$epi$num[at] <- length(status)
   dat$epi$num.B[at] <- sum(race == "B", na.rm = TRUE)
   dat$epi$num.W[at] <- sum(race == "W", na.rm = TRUE)
-  dat$epi$s.num[at] <- sum(status == 0, na.rm = TRUE)
+  dat$epi$num.B.male <- sum(race == "B" & male == 1, na.rm = TRUE)
+  dat$epi$num.W.male <- sum(race == "W" & male == 1, na.rm = TRUE)
+  dat$epi$num.B.feml <- sum(race == "B" & male == 0, na.rm = TRUE)
+  dat$epi$num.W.feml <- sum(race == "W" & male == 0, na.rm = TRUE)
   dat$epi$i.num[at] <- sum(status == 1, na.rm = TRUE)
   dat$epi$i.num.B[at] <- sum(status == 1 & race == "B", na.rm = TRUE)
   dat$epi$i.num.W[at] <- sum(status == 1 & race == "W", na.rm = TRUE)
-  dat$epi$i.prev[at] <- dat$epi$i.num[at] / dat$epi$num[at]
-  dat$epi$i.prev.B[at] <- dat$epi$i.num.B[at] / dat$epi$num.B[at]
-  dat$epi$i.prev.W[at] <- dat$epi$i.num.W[at] / dat$epi$num.W[at]
-
-  dat$epi$prepCurr[at] <- sum(prepStat == 1, na.rm = TRUE)
-  dat$epi$prepElig[at] <- sum(dat$attr$prepElig == 1, na.rm = TRUE)
-  dat$epi$i.num.prep0[at] <- sum((is.na(prepStat) | prepStat == 0) &
-                                   status == 1, na.rm = TRUE)
-  dat$epi$i.num.prep1[at] <- sum(prepStat == 1 & status == 1, na.rm = TRUE)
-  dat$epi$i.prev.prep0[at] <- dat$epi$i.num.prep0[at] /
-    sum((is.na(prepStat) | prepStat == 0), na.rm = TRUE)
-  if (at == 1) {
-    dat$epi$i.prev.prep1[1] <- 0
-  } else {
-    dat$epi$i.prev.prep1[at] <- dat$epi$i.num.prep1[at] /
-      sum(prepStat == 1, na.rm = TRUE)
-  }
+  dat$epi$i.num.B.male <- sum(race == "B" & male == 1 & status == 1, na.rm = TRUE)
+  dat$epi$i.num.W.male <- sum(race == "W" & male == 1 & status == 1, na.rm = TRUE)
+  dat$epi$i.num.B.feml <- sum(race == "B" & male == 0 & status == 1, na.rm = TRUE)
+  dat$epi$i.num.W.feml <- sum(race == "W" & male == 0 & status == 1, na.rm = TRUE)
 
   return(dat)
 }
