@@ -29,3 +29,14 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+
+static const R_CallMethodDef CallEntries[] = {
+    {"EpiModelHIV_aging_msm", (DL_FUNC) &EpiModelHIV_aging_msm, 2},
+    {"EpiModelHIV_aging_het", (DL_FUNC) &EpiModelHIV_aging_het, 2},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_EpiModelHIV(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}

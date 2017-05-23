@@ -1,6 +1,8 @@
 rm(list = ls())
 suppressMessages(library("EpiModelHIV"))
 
+load("")
+
 data(est)
 data(st)
 
@@ -10,11 +12,10 @@ param <- param_msm(nwstats = st,
 init <- init_msm(nwstats = st,
                  prev.B = 0.253,
                  prev.W = 0.253)
-control <- control_msm(simno = 0.253,
+control <- control_msm(simno = 1,
                        nsteps = 52,
-                       nsims = 5,
+                       nsims = 1,
                        ncores = 1,
-                       save.nwstats = TRUE,
                        verbose.int = 1)
 # sim <- netsim(est, param, init, control)
 
@@ -25,10 +26,6 @@ at <- 1
 dat <- initialize_msm(est, param, init, control, s = 1)
 # dat <- reinit_msm(sim, param, init, control, s = 1)
 
-# mf <- dat$p[[1]]$model.form
-# mf$terms[[4]]
-
-
 at <- at + 1
 dat <- aging_msm(dat, at)
 dat <- deaths_msm(dat, at)
@@ -38,8 +35,6 @@ dat <- tx_msm(dat, at)
 dat <- prep_msm(dat, at)
 dat <- progress_msm(dat, at)
 dat <- vl_msm(dat, at)
-# dat <- update_aiclass_msm(dat, at)
-# dat <- update_roleclass_msm(dat, at)
 dat <- simnet_msm(dat, at)
 dat <- disclose_msm(dat, at)
 dat <- acts_msm(dat, at)
