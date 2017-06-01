@@ -445,7 +445,7 @@ init_status_msmhet <- function(dat) {
   num.B <- sum(race == "B")
   num.W <- sum(race == "W")
   ids.B <- union(ids.B.male, ids.B.feml)
-  ids.W <- union(ids.B.feml, ids.W.feml)
+  ids.W <- union(ids.W.male, ids.W.feml)
 
   num <- length(race)
   age <- dat$attr$age
