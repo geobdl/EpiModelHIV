@@ -1021,9 +1021,9 @@ births_msmhet <- function(dat, at){
 
   ## Update Attr
   if (nBirths > 0) {
-    dat <- setBirthAttr_msm(dat, at, nBirths.B, nBirths.W)
+    dat <- setBirthAttr_msmhet(dat, at, nBirths.B, nBirths.W)
   }
-
+  stopifnot(length(unique(vapply(dat$attr, length, FUN.VALUE = 1L))) == 1)
 
   # Update Networks
   if (nBirths > 0) {
@@ -1058,6 +1058,9 @@ setBirthAttr_msmhet <- function(dat, at, nBirths.B, nBirths.W) {
 
   dat$attr$arrival.time[newIds] <- rep(at, nBirths)
 
+  male <- sample(0:1, nBirths, TRUE)
+  dat$attr$male[newIds] <- male
+
   race <- sample(rep(c("B", "W"), c(nBirths.B, nBirths.W)))
   newB <- which(race == "B")
   newW <- which(race == "W")
@@ -1069,33 +1072,43 @@ setBirthAttr_msmhet <- function(dat, at, nBirths.B, nBirths.W) {
   # Disease status and related
   dat$attr$status[newIds] <- rep(0, nBirths)
 
-  dat$attr$inst.ai.class[newIds] <- sample(1:dat$param$num.inst.ai.classes,
-                                           nBirths, replace = TRUE)
-
-  dat$attr$tt.traj[newIds[newB]] <- sample(c(1, 2, 3, 4),
-                                           nBirths.B, replace = TRUE,
+  dat$attr$tt.traj[newIds[newB]] <- sample(1:4,
+                                           nBirths.B,
+                                           replace = TRUE,
                                            prob = dat$param$tt.traj.B.prob)
-  dat$attr$tt.traj[newIds[newW]] <- sample(c(1, 2, 3, 4),
+  dat$attr$tt.traj[newIds[newW]] <- sample(1:4,
                                            nBirths.W, replace = TRUE,
                                            prob = dat$param$tt.traj.W.prob)
 
   # Circumcision
-  dat$attr$circ[newIds[newB]] <- rbinom(nBirths.B, 1, dat$param$circ.B.prob)
-  dat$attr$circ[newIds[newW]] <- rbinom(nBirths.W, 1, dat$param$circ.W.prob)
+  newB.male <- which(male == 1 & race == "B")
+  newW.male <- which(male == 1 & race == "W")
+
+  dat$attr$circ[newIds[newB.male]] <- rbinom(length(newB.male), 1, dat$param$circ.B.prob)
+  dat$attr$circ[newIds[newW.male]] <- rbinom(length(newW.male), 1, dat$param$circ.W.prob)
+
+  # msm.class
+  msm.class <- rep(NA, nBirths)
+  msm.class[male == 0] <- 4
+  msm.class[male == 1] <- sample(1:3, sum(male == 1), TRUE, c(0.1, 0.1, 0.8))
+  dat$attr$msm.class[newIds] <- msm.class
 
   # Role
-  dat$attr$role.class[newIds[newB]] <- sample(c("I", "R", "V"),
-                                              nBirths.B, replace = TRUE,
+  table(dat$attr$msm.class, dat$attr$role.class)
+  newB.msm <- which(msm.class %in% 1:2 & race == "B")
+  newW.msm <- which(msm.class %in% 1:2 & race == "W")
+
+  dat$attr$role.class[newIds[newB.msm]] <- sample(c("I", "R", "V"),
+                                              length(newB.msm), replace = TRUE,
                                               prob = dat$param$role.B.prob)
-  dat$attr$role.class[newIds[newW]] <- sample(c("I", "R", "V"),
-                                              nBirths.W, replace = TRUE,
+  dat$attr$role.class[newIds[newW.msm]] <- sample(c("I", "R", "V"),
+                                              length(newW.msm), replace = TRUE,
                                               prob = dat$param$role.W.prob)
 
   ins.quot <- rep(NA, nBirths)
-  ins.quot[dat$attr$role.class[newIds] == "I"]  <- 1
-  ins.quot[dat$attr$role.class[newIds] == "R"]  <- 0
-  ins.quot[dat$attr$role.class[newIds] == "V"]  <-
-    runif(sum(dat$attr$role.class[newIds] == "V"))
+  ins.quot[which(dat$attr$role.class[newIds] == "I")]  <- 1
+  ins.quot[which(dat$attr$role.class[newIds] == "R")]  <- 0
+  ins.quot[which(dat$attr$role.class[newIds] == "V")]  <- runif(sum(dat$attr$role.class[newIds] == "V", na.rm = TRUE))
   dat$attr$ins.quot[newIds] <- ins.quot
 
   # CCR5
@@ -1112,7 +1125,9 @@ setBirthAttr_msmhet <- function(dat, at, nBirths.B, nBirths.W) {
 
 
   # One-off risk group
-  dat$attr$riskg[newIds] <- sample(1:5, nBirths, TRUE)
+  table(dat$attr$riskg, dat$attr$msm.class)
+
+  dat$attr$riskg[newIds[msm.class %in% 1:2]] <- sample(1:5, sum(msm.class %in% 1:2), TRUE)
 
   # UAI group
   p1 <- dat$param$cond.pers.always.prob
