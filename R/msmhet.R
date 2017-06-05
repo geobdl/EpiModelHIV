@@ -1430,75 +1430,78 @@ vl_msmhet <- function(dat, at) {
   # 1. tx-naive
   target <- which(status == 1 & cum.time.on.tx == 0)
   inf.time.bp.tn <- inf.time.bp[target]
+  selected <- which(status == 1 &
+                    cum.time.on.tx == 0)
+  inf.time.bp.tn <- inf.time.bp[selected]
   new.vl <- (inf.time.bp.tn <= vlard) * (vlap * inf.time.bp.tn / vlard) +
             (inf.time.bp.tn > vlard) * (inf.time.bp.tn <= vlard + vlafd) *
             ((vlsp - vlap) * (inf.time.bp.tn - vlard) / vlafd + vlap) +
             (inf.time.bp.tn > vlard + vlafd) * (inf.time.bp.tn <= vldo) * (vlsp) +
             (inf.time.bp.tn > vldo) * (vlsp + (inf.time.bp.tn - vldo) * vlds)
-  vl[target] <- new.vl
+  vl[selected] <- new.vl
 
   # 2. on tx, tt.traj=full, not yet escaped
-  target <- which(tx.status == 1 &
-                  tt.traj == 4 &
-                  stage != 4)
-  current.vl <- vl[target]
+  selected <- which(tx.status == 1 &
+                    tt.traj == 4 &
+                    stage != 4)
+  current.vl <- vl[selected]
   new.vl <- pmax(current.vl - full.supp.down.slope, vl.full.supp)
-  vl[target] <- new.vl
+  vl[selected] <- new.vl
 
   # 3. on tx, tt.traj=part, not yet escaped
-  target <- which(tx.status == 1 &
-                  tt.traj == 3 &
-                  stage != 4)
-  current.vl <- vl[target]
+  selected <- which(tx.status == 1 &
+                    tt.traj == 3 &
+                    stage != 4)
+  current.vl <- vl[selected]
   new.vl <- pmax(current.vl - part.supp.down.slope, vl.part.supp)
-  vl[target] <- new.vl
+  vl[selected] <- new.vl
 
   # 4. off tx, not naive, tt.traj=full, not yet escaped
-  target <- which(tx.status == 0 &
-                  tt.traj == 4 &
-                  cum.time.on.tx > 0 &
-                  stage != 4)
-  current.vl <- vl[target]
+  selected <- which(tx.status == 0 &
+                    tt.traj == 4 &
+                    cum.time.on.tx > 0 &
+                    stage != 4)
+  current.vl <- vl[selected]
   new.vl <- pmin(current.vl + full.supp.up.slope, vlsp)
-  vl[target] <- new.vl
+  vl[selected] <- new.vl
 
   # 5. off tx, not naive, tt.traj=part, not yet escaped
-  target <- which(tx.status == 0 &
-                  tt.traj == 3 &
-                  cum.time.on.tx > 0 &
-                  stage != 4)
-  current.vl <- vl[target]
+  selected <- which(tx.status == 0 &
+                    tt.traj == 3 &
+                    cum.time.on.tx > 0 &
+                    stage != 4)
+  current.vl <- vl[selected]
   new.vl <- pmin(current.vl + part.supp.up.slope, vlsp)
-  vl[target] <- new.vl
+  vl[selected] <- new.vl
 
   # 6. on tx, tt.traj=full, escaped
   # Doesn't exist.
 
   # 7. on tx, tt.traj=part, escaped
-  target <- which(tx.status == 1 &
-                  tt.traj == 3 &
-                  stage == 4)
-  current.vl <- vl[target]
+  selected <- which(tx.status == 1 &
+                    tt.traj == 3 &
+                    stage == 4)
+  current.vl <- vl[selected]
   new.vl <- current.vl + vlds
-  vl[target] <- new.vl
+  vl[selected] <- new.vl
 
   # 8. off tx, tt.traj=full, and escaped
-  target <- which(tx.status == 0 &
-                  tt.traj == 4 &
-                  cum.time.on.tx > 0 &
-                  stage == 4)
-  current.vl <- vl[target]
+  selected <- which(tx.status == 0 &
+                    tt.traj == 4 &
+                    cum.time.on.tx > 0 &
+                    stage == 4)
+  current.vl <- vl[selected]
   new.vl <- current.vl + vlds
-  vl[target] <- new.vl
+  vl[selected] <- new.vl
 
   # 9. off tx, tt.traj=part, and escaped
-  target <- which(tx.status == 0 &
-                  tt.traj == 3 &
-                  cum.time.on.tx > 0 &
-                  stage == 4)
-  current.vl <- vl[target]
+  selected <- which(tx.status == 0 &
+                    tt.traj == 3 &
+                    cum.time.on.tx > 0 &
+                    stage == 4)
+  current.vl <- vl[selected]
   new.vl <- current.vl + vlds
-  vl[target] <- new.vl
+  vl[selected] <- new.vl
 
 
   ## Output
