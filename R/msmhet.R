@@ -1428,8 +1428,6 @@ vl_msmhet <- function(dat, at) {
 
   ## Process
   # 1. tx-naive
-  target <- which(status == 1 & cum.time.on.tx == 0)
-  inf.time.bp.tn <- inf.time.bp[target]
   selected <- which(status == 1 &
                     cum.time.on.tx == 0)
   inf.time.bp.tn <- inf.time.bp[selected]
