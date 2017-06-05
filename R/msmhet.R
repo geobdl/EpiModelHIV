@@ -1312,8 +1312,6 @@ tx_msmhet <- function(dat, at) {
 
   ## Summary statistics
   dat$epi$tx.init.inc[at] <- length(tx.init)
-  dat$epi$tx.halt.inc[at] <- length(tx.halt)
-  dat$epi$tx.resm.inc[at] <- length(tx.reinit)
 
   return(dat)
 }
