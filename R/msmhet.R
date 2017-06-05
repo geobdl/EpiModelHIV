@@ -1310,8 +1310,6 @@ tx_msmhet <- function(dat, at) {
   dat$attr$cum.time.off.tx <- dat$attr$cum.time.off.tx +
                               ((dat$attr$tx.status == 0) %in% TRUE)
 
-  ## Summary statistics
-  dat$epi$tx.init.inc[at] <- length(tx.init)
 
   return(dat)
 }
