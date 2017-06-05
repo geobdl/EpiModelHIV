@@ -1245,17 +1245,23 @@ tx_msmhet <- function(dat, at) {
 
 
   ## Initiation
-  tx.init.elig.B <- which(race == "B" & status == 1 &
-                            tx.status == 0 & diag.status == 1 &
-                            tt.traj %in% c(3, 4) & cum.time.on.tx == 0 &
-                            stage != 4)
+  tx.init.elig.B <- which(race == "B" &
+                          status == 1 &
+                          tx.status == 0 &
+                          diag.status == 1 &
+                          tt.traj %in% 3:4 &
+                          cum.time.on.tx == 0 &
+                          stage != 4)
   tx.init.B <- tx.init.elig.B[rbinom(length(tx.init.elig.B), 1,
                                      tx.init.B.prob) == 1]
 
-  tx.init.elig.W <- which(race == "W" & status == 1 &
-                            tx.status == 0 & diag.status == 1 &
-                            tt.traj %in% c(3, 4) & cum.time.on.tx == 0 &
-                            stage != 4)
+  tx.init.elig.W <- which(race == "W" &
+                          status == 1 &
+                          tx.status == 0 &
+                          diag.status == 1 &
+                          tt.traj %in% 3:4 &
+                          cum.time.on.tx == 0 &
+                          stage != 4)
   tx.init.W <- tx.init.elig.W[rbinom(length(tx.init.elig.W), 1,
                                      tx.init.W.prob) == 1]
 
@@ -1266,11 +1272,13 @@ tx_msmhet <- function(dat, at) {
 
 
   ## Halting
-  tx.halt.elig.B <- which(race == "B" & tx.status == 1)
+  tx.halt.elig.B <- which(race == "B" &
+                          tx.status == 1)
   tx.halt.B <- tx.halt.elig.B[rbinom(length(tx.halt.elig.B), 1,
                                      tx.halt.B.prob) == 1]
 
-  tx.halt.elig.W <- which(race == "W" & tx.status == 1)
+  tx.halt.elig.W <- which(race == "W" &
+                          tx.status == 1)
   tx.halt.W <- tx.halt.elig.W[rbinom(length(tx.halt.elig.W),
                                      1, tx.halt.W.prob) == 1]
   tx.halt <- c(tx.halt.B, tx.halt.W)
@@ -1278,13 +1286,17 @@ tx_msmhet <- function(dat, at) {
 
 
   ## Restarting
-  tx.reinit.elig.B <- which(race == "B" & tx.status == 0 &
-                              cum.time.on.tx > 0 & stage != 4)
+  tx.reinit.elig.B <- which(race == "B" &
+                            tx.status == 0 &
+                            cum.time.on.tx > 0 &
+                            stage != 4)
   tx.reinit.B <- tx.reinit.elig.B[rbinom(length(tx.reinit.elig.B),
                                          1, tx.reinit.B.prob) == 1]
 
-  tx.reinit.elig.W <- which(race == "W" & tx.status == 0 &
-                              cum.time.on.tx > 0 & stage != 4)
+  tx.reinit.elig.W <- which(race == "W" &
+                            tx.status == 0 &
+                            cum.time.on.tx > 0 &
+                            stage != 4)
   tx.reinit.W <- tx.reinit.elig.W[rbinom(length(tx.reinit.elig.W),
                                          1, tx.reinit.W.prob) == 1]
 
@@ -1294,9 +1306,9 @@ tx_msmhet <- function(dat, at) {
 
   ## Other output
   dat$attr$cum.time.on.tx <- dat$attr$cum.time.on.tx +
-    ((dat$attr$tx.status == 1) %in% TRUE)
+                             ((dat$attr$tx.status == 1) %in% TRUE)
   dat$attr$cum.time.off.tx <- dat$attr$cum.time.off.tx +
-    ((dat$attr$tx.status == 0) %in% TRUE)
+                              ((dat$attr$tx.status == 0) %in% TRUE)
 
   ## Summary statistics
   dat$epi$tx.init.inc[at] <- length(tx.init)
