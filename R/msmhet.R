@@ -1397,7 +1397,6 @@ progress_msmhet <- function(dat, at) {
 vl_msmhet <- function(dat, at) {
 
   ## Variables
-
   # Attributes
   inf.time.bp <- at - dat$attr$inf.time
   # cum.time.off.tx <- dat$attr$cum.time.off.tx
@@ -1422,17 +1421,12 @@ vl_msmhet <- function(dat, at) {
   part.supp.down.slope <- dat$param$part.supp.down.slope
   full.supp.up.slope <- dat$param$full.supp.up.slope
   part.supp.up.slope <- dat$param$part.supp.up.slope
-  # max.time.off.tx.part <- dat$param$max.time.off.tx.part
-  # max.time.on.tx.part <- dat$param$max.time.on.tx.part
 
   # Calculations
   vlds <- (vlf - vlsp) / vldd
-  # part.tx.score <-  (cum.time.off.tx / max.time.off.tx.part) +
-  #                   (cum.time.on.tx / max.time.on.tx.part)
 
 
   ## Process
-
   # 1. tx-naive men
   target <- which(status == 1 & cum.time.on.tx == 0)
   inf.time.bp.tn <- inf.time.bp[target]
