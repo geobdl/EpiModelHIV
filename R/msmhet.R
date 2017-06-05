@@ -1342,7 +1342,7 @@ progress_msmhet <- function(dat, at) {
 
   ## Process
   # Increment day
-  stage.time[active == 1] <- stage.time[active == 1] + 1
+  stage.time[which(status == 1)] <- stage.time[which(status == 1)] + 1
 
   # Change stage to Acute Falling
   toAF <- which(active == 1 &
