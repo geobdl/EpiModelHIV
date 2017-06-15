@@ -1936,24 +1936,24 @@ position_msmhet <- function(dat, at) {
   neg.role.class <- role.class[dal[, 2]]
 
   ins <- rep(NA, length(pos.role.class))
-  ins[which(pos.role.class == "I")] <- 1  # "P"
-  ins[which(pos.role.class == "R")] <- 0  # "N"
-  ins[which(neg.role.class == "I")] <- 0  # "N"
-  ins[which(neg.role.class == "R")] <- 1  # "P"
+  ins[which(pos.role.class == "I" & !is.na(neg.role.class))] <- 1  # "P"
+  ins[which(pos.role.class == "R" & !is.na(neg.role.class))] <- 0  # "N"
+  ins[which(neg.role.class == "I" & !is.na(pos.role.class))] <- 0  # "N"
+  ins[which(neg.role.class == "R" & !is.na(pos.role.class))] <- 1  # "P"
 
   vv <- which(pos.role.class == "V" & neg.role.class == "V")
   vv.race.combo <- paste0(race[dal[, 1]][vv], race[dal[, 2]][vv])
   vv.race.combo[vv.race.combo == "WB"] <- "BW"
   vv.iev.prob <- (vv.race.combo == "BB") * vv.iev.BB.prob +
-    (vv.race.combo == "BW") * vv.iev.BW.prob +
-    (vv.race.combo == "WW") * vv.iev.WW.prob
+                 (vv.race.combo == "BW") * vv.iev.BW.prob +
+                 (vv.race.combo == "WW") * vv.iev.WW.prob
 
   iev <- rbinom(length(vv), 1, vv.iev.prob)
   ins[vv[iev == 1]] <- 2 # "B"
   vv.remaining <- vv[iev == 0]
 
   inspos.prob <- ins.quot[dal[, 1][vv.remaining]] /
-    (ins.quot[dal[, 1][vv.remaining]] + ins.quot[dal[, 2][vv.remaining]])
+                 (ins.quot[dal[, 1][vv.remaining]] + ins.quot[dal[, 2][vv.remaining]])
   inspos <- rbinom(length(vv.remaining), 1, inspos.prob)
   ins[vv.remaining[inspos == 1]] <- 1  # "P"
   ins[vv.remaining[inspos == 0]] <- 0  # "N"
