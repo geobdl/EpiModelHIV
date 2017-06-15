@@ -1967,7 +1967,7 @@ position_msmhet <- function(dat, at) {
 
 
 #' @export
-trans_msmhet <- function(dat, at){
+trans_msmhet_msm <- function(dat, at){
 
   # Variables -----------------------------------------------------------
 
@@ -2122,8 +2122,35 @@ trans_msmhet <- function(dat, at){
   # Summary Output
   dat$epi$incid[at] <- length(infected)
 
-
   return(dat)
+}
+
+
+#' @export
+trans_msmhet_het <- function(dat, at) {
+
+  browser()
+
+  male <- dat$attr$male
+  status <- dat$attr$status
+
+  # Data
+  dal <- dat$temp$dal
+  dal <- dal[sample(1:nrow(dal)), ]
+  ncols <- dim(dal)[2]
+
+  if (nrow(dal) == 0) {
+    return(dat)
+  }
+
+  disc.het <- dal[is.na(dal[, "ins"]), -6]
+  stopifnot(all(rowSums(matrix(male[disc.het[, 1:2]],
+                               nrow = nrow(disc.het))) == 1))
+
+  head(disc.het, 25)
+  status[disc.het[, 2]]
+
+
 }
 
 
