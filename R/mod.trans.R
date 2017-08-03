@@ -36,6 +36,20 @@ hiv_trans_msm <- function(dat, at) {
 
   # Variables -----------------------------------------------------------
 
+  sim_loops <- 1:30
+  
+  df.scenario <- read.csv('scenario_list.csv')
+  
+  for (j in seq_along(sim_loops)){
+    
+  hiv.trans.gc.rr <- df.scenario$gctrans[j]
+  hiv.trans.ct.rr <- df.scenario$cttrans[j]
+  hiv.trans.syph.rr <- df.scenario$syphtrans[j]
+  hiv.trans.gc.ct.rr <- df.scenario$gccttrans[j]
+  hiv.trans.gc.syph.rr <- df.scenario$gcsyphtrans[j]
+  hiv.trans.ct.syph.rr <- df.scenario$ctsyphtrans[j]
+  hiv.trans.allsti.rr <- df.scenario$allstitrans[j]
+
   # Attributes
   vl <- dat$attr$vl
   stage <- dat$attr$stage
@@ -73,14 +87,6 @@ hiv_trans_msm <- function(dat, at) {
   hiv.uct.usyph.rr <- dat$param$hiv.uct.usyph.rr
   hiv.all.ureth.rr <- dat$param$hiv.all.ureth.rr
   hiv.all.rect.rr <- dat$param$hiv.all.rect.rr
-
-  hiv.trans.syph.rr <- dat$param$hiv.trans.syph.rr
-  hiv.trans.gc.rr <- dat$param$hiv.trans.gc.rr
-  hiv.trans.ct.rr <- dat$param$hiv.trans.ct.rr
-  hiv.trans.gc.ct.rr <- dat$param$hiv.trans.ct.rr
-  hiv.trans.gc.syph.rr <- dat$param$hiv.trans.gc.syph.rr
-  hiv.trans.ct.syph.rr <- dat$param$hiv.trans.ct.syph.rr
-  hiv.trans.allsti.rr <- dat$param$hiv.trans.allsti.rr
 
 
   # Data
@@ -454,13 +460,21 @@ hiv_trans_msm <- function(dat, at) {
   trans.main <- rep(NA,length(num_of_sims))
   trans.pers <- rep(NA,length(num_of_sims))
   trans.inst <- rep(NA,length(num_of_sims))
+  gctrans	<- rep(NA,length(num_of_sims))
+  cttrans	<- rep(NA,length(num_of_sims))	
+  syphtrans	<- rep(NA,length(num_of_sims))	
+  gccttrans	<- rep(NA,length(num_of_sims))	
+  gcsyphtrans	<- rep(NA,length(num_of_sims))	
+  ctsyphtrans	<- rep(NA,length(num_of_sims))	
+  allstitrans	<- rep(NA,length(num_of_sims))
   
   df.direct <- data.frame(sum_GC,sum_CT,sum_syph,sum_urethral,sum_rectal,
                           cell1_gc,cell2_gc,cell3_gc,cell4_gc,
                           cell1_ct,cell2_ct,cell3_ct,cell4_ct,
                           cell1_syph,cell2_syph,cell3_syph,cell4_syph,
                           cell1_sti,cell2_sti,cell3_sti,cell4_sti,
-                          incid,ir100,trans.main,trans.pers,trans.inst)
+                          incid,ir100,trans.main,trans.pers,trans.inst,
+                          gctrans,cttrans,syphtrans,gccttrans,gcsyphtrans,ctsyphtrans,allstitrans)
   
   scenario <- 1:100000
   for(i in seq_along(scenario)){
@@ -635,9 +649,22 @@ hiv_trans_msm <- function(dat, at) {
   df.direct$trans.main[i] <- sum(inf.type == 1)
   df.direct$trans.pers[i] <- sum(inf.type == 2)
   df.direct$trans.inst[i] <- sum(inf.type == 3)
-
+  
+  df.direct$gctrans[i]	<- df.scenario$gctrans[j]
+  df.direct$cttrans[i]	<- df.scenario$cttrans[j]
+  df.direct$syphtrans[i]	<- df.scenario$syphtrans[j]
+  df.direct$gccttrans[i]	<- df.scenario$gccttrans[j]
+  df.direct$gcsyphtrans[i]	<- df.scenario$gcsyphtrans[j]	
+  df.direct$ctsyphtrans[i]	<- df.scenario$ctsyphtrans[j]
+  df.direct$allstitrans[i]	<- df.scenario$allstitrans[j]
+  
   }
-  df.direct <<- df.direct
+  write.csv(df.direct, file = paste("sim",df.scenario$scenario_num[j],".csv"))
+  
+  rm(df.direct)
+  
+  #end first for loop here
+  }
   
   return(dat)
 }
