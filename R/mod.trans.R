@@ -424,8 +424,47 @@ hiv_trans_msm <- function(dat, at) {
   ## Retransformation to probability
   rp.tprob <- plogis(rp.tlo)
   stopifnot(rp.tprob >= 0, rp.tprob <= 1)
+  
+  num_of_sims <- 1:100000
 
-
+  sum_GC <- rep(NA,length(num_of_sims))
+  sum_CT <- rep(NA,length(num_of_sims))
+  sum_syph <- rep(NA,length(num_of_sims))
+  sum_urethral <- rep(NA,length(num_of_sims))
+  sum_rectal <- rep(NA,length(num_of_sims))
+  cell1_gc <- rep(NA,length(num_of_sims))
+  cell2_gc <- rep(NA,length(num_of_sims))
+  cell3_gc <- rep(NA,length(num_of_sims))
+  cell4_gc <- rep(NA,length(num_of_sims))
+  cell1_ct <- rep(NA,length(num_of_sims))
+  cell2_ct <- rep(NA,length(num_of_sims))
+  cell3_ct <- rep(NA,length(num_of_sims))
+  cell4_ct <- rep(NA,length(num_of_sims))
+  cell1_syph <- rep(NA,length(num_of_sims))
+  cell2_syph <- rep(NA,length(num_of_sims))
+  cell3_syph <- rep(NA,length(num_of_sims))
+  cell4_syph <- rep(NA,length(num_of_sims))
+  cell1_sti <- rep(NA,length(num_of_sims))
+  cell2_sti <- rep(NA,length(num_of_sims))
+  cell3_sti <- rep(NA,length(num_of_sims))
+  cell4_sti <- rep(NA,length(num_of_sims))
+  # Summary Output
+  incid <- rep(NA,length(num_of_sims))
+  ir100 <- rep(NA,length(num_of_sims))
+  trans.main <- rep(NA,length(num_of_sims))
+  trans.pers <- rep(NA,length(num_of_sims))
+  trans.inst <- rep(NA,length(num_of_sims))
+  
+  df.direct <- data.frame(sum_GC,sum_CT,sum_syph,sum_urethral,sum_rectal,
+                          cell1_gc,cell2_gc,cell3_gc,cell4_gc,
+                          cell1_ct,cell2_ct,cell3_ct,cell4_ct,
+                          cell1_syph,cell2_syph,cell3_syph,cell4_syph,
+                          cell1_sti,cell2_sti,cell3_sti,cell4_sti,
+                          incid,ir100,trans.main,trans.pers,trans.inst)
+  
+  scenario <- 1:100000
+  for(i in seq_along(scenario)){
+  
   # Transmission --------------------------------------------------------
 
   ## Bernoulli transmission events
@@ -466,97 +505,97 @@ hiv_trans_msm <- function(dat, at) {
   # dat$attr$time.hivneg[status == 0] <- dat$attr$time.hivneg[status == 0] + 1
 
   trans <- rbind(disc.ip[trans.ip == 1, ], disc.rp[trans.rp == 1, ])
-  df.direct$sum_GC[sim] <- length(which(((rGC[trans[, 2]] == 1 | uGC[trans[, 1]] == 1) & trans[, 6] == 1) |
+  df.direct$sum_GC[i] <- length(which(((rGC[trans[, 2]] == 1 | uGC[trans[, 1]] == 1) & trans[, 6] == 1) |
                                        ((uGC[trans[, 2]] == 1 | rGC[trans[, 1]] == 1) & trans[, 6] == 0)))
 
-  df.direct$sum_CT[sim] <- length(which(((rCT[trans[, 2]] == 1 | uCT[trans[, 1]] == 1) & trans[, 6] == 1) |
+  df.direct$sum_CT[i] <- length(which(((rCT[trans[, 2]] == 1 | uCT[trans[, 1]] == 1) & trans[, 6] == 1) |
                                        ((uCT[trans[, 2]] == 1 | rCT[trans[, 1]] == 1) & trans[, 6] == 0)))
 
-  df.direct$sum_syph[sim] <- length(which(stage.syph[trans[, 2]] %in% c(1,2,3) | stage.syph[trans[, 1]] %in% c(1,2,3)))
+  df.direct$sum_syph[i] <- length(which(stage.syph[trans[, 2]] %in% c(1,2,3) | stage.syph[trans[, 1]] %in% c(1,2,3)))
 
-  df.direct$sum_urethral[sim] <- length(which(((uGC[trans[, 1]] == 1 | uCT[trans[, 1]] == 1) & trans[, 6] == 1) |
+  df.direct$sum_urethral[i] <- length(which(((uGC[trans[, 1]] == 1 | uCT[trans[, 1]] == 1) & trans[, 6] == 1) |
                                              ((uGC[trans[, 2]] == 1 | uCT[trans[, 2]] == 1) & trans[, 6] == 0)))
 
-  df.direct$sum_rectal[sim] <- length(which(((rGC[trans[, 2]] == 1 | rCT[trans[, 2]] == 1) & trans[, 6] == 1) |
+  df.direct$sum_rectal[i] <- length(which(((rGC[trans[, 2]] == 1 | rCT[trans[, 2]] == 1) & trans[, 6] == 1) |
                                            ((rGC[trans[, 1]] == 1 | rCT[trans[, 1]] == 1) & trans[, 6] == 0)))
   #2x2 for PAF
   #               HIV+
   #             STI+  STI-
   #HIV-   STI +  1    2
   #       STI -  3    4
-  df.direct$cell1_gc[sim] <- length(which(
+  df.direct$cell1_gc[i] <- length(which(
     # P1 is infected, p1 has urethral and p2 has rectal OR
     (status[trans[, 1]] == 1 & rGC[trans[, 2]] == 1 & uGC[trans[, 1]] == 1) |
       # P2 is infected, p1 has urethral and p2 has rectal
     (status[trans[, 2]] == 1 & rGC[trans[, 2]] == 1 & uGC[trans[, 1]] == 1)))
 
-  df.direct$cell2_gc[sim] <- length(which(
+  df.direct$cell2_gc[i] <- length(which(
     # P1 is infected, p1 does not have urethral GC, p2 has rectal GC
     (status[trans[, 1]] == 1 & uGC[trans[, 1]] == 0 & rGC[trans[, 2]] == 1) |
     # P2 is infected, p1 has urethral GC, p2 does not have rectal GC
     (status[trans[, 2]] == 1 & uGC[trans[, 1]] == 1 & rGC[trans[, 2]] == 0)))
 
-  df.direct$cell3_gc[sim] <- length(which(
+  df.direct$cell3_gc[i] <- length(which(
     # P1 is infected, p1 has urethral GC, p2 does not have rectal GC
     (status[trans[, 1]] == 1 & uGC[trans[, 1]] == 1 & rGC[trans[, 2]] == 0) |
     # P2 is infected, p1 does not have urethral GC, p2 does have rectal GC
     (status[trans[, 2]] == 1 & uGC[trans[, 1]] == 0 & rGC[trans[, 2]] == 1)))
 
-  df.direct$cell4_gc[sim] <- length(which(
+  df.direct$cell4_gc[i] <- length(which(
     # P1 is infected, p1 does not have urethral GC, p2 does not have rectal GC
     (status[trans[, 1]] == 1 & uGC[trans[, 1]] == 0 & rGC[trans[, 2]] == 0) |
     # P2 is infected, p1 does not have urethral GC, p2 does not have rectal GC
     (status[trans[, 2]] == 1 & uGC[trans[, 1]] == 0 & rGC[trans[, 2]] == 0)))
 
-  df.direct$cell1_ct[sim] <- length(which(
+  df.direct$cell1_ct[i] <- length(which(
     # P1 is infected, p1 has urethral and p2 has rectal OR
     (status[trans[, 1]] == 1 & rCT[trans[, 2]] == 1 & uCT[trans[, 1]] == 1) |
       # P2 is infected, p1 has urethral and p2 has rectal
       (status[trans[, 2]] == 1 & rCT[trans[, 2]] == 1 & uCT[trans[, 1]] == 1)))
 
-  df.direct$cell2_ct[sim] <- length(which(
+  df.direct$cell2_ct[i] <- length(which(
     # P1 is infected, p1 does not have urethral CT, p2 has rectal CT
     (status[trans[, 1]] == 1 & uCT[trans[, 1]] == 0 & rCT[trans[, 2]] == 1) |
     # P2 is infected, p1 has urethral CT, p2 does not have rectal CT
     (status[trans[, 2]] == 1 & uCT[trans[, 1]] == 1 & rCT[trans[, 2]] == 0)))
 
-  df.direct$cell3_ct[sim] <- length(which(
+  df.direct$cell3_ct[i] <- length(which(
     # P1 is infected, p1 has urethral CT, p2 does not have rectal CT
     (status[trans[, 1]] == 1 & uCT[trans[, 1]] == 1 & rCT[trans[, 2]] == 0) |
     # P2 is infected, p1 does not have urethral CT, p2 does have rectal CT
     (status[trans[, 2]] == 1 & uCT[trans[, 1]] == 0 & rCT[trans[, 2]] == 1)))
 
-  df.direct$cell4_ct[sim] <- length(which(
+  df.direct$cell4_ct[i] <- length(which(
     # P1 is infected, p1 does not have urethral CT, p2 does not have rectal CT
     (status[trans[, 1]] == 1 & uCT[trans[, 1]] == 0 & rCT[trans[, 2]] == 0) |
     # P2 is infected, p1 does not have urethral CT, p2 does not have rectal CT
     (status[trans[, 2]] == 1 & uCT[trans[, 1]] == 0 & rCT[trans[, 2]] == 0)))
 
-  df.direct$cell1_syph[sim] <- length(which(
+  df.direct$cell1_syph[i] <- length(which(
     #P1 is infected, P1 has syphilis, P2 has syphilis
     status[trans[, 1]] == 1 & stage.syph[trans[, 2]] %in% c(1,2,3) & stage.syph[trans[, 1]] %in% c(1,2,3) |
     #P2 is infected, P1 has syphilis, P2 has syphilis
     status[trans[, 2]] == 1 & stage.syph[trans[, 2]] %in% c(1,2,3) & stage.syph[trans[, 1]] %in% c(1,2,3)))
 
-  df.direct$cell2_syph[sim] <- length(which(
+  df.direct$cell2_syph[i] <- length(which(
     #P1 is infected, P1 does not have syphilis, P2 has syphilis
     status[trans[, 1]] == 1 & stage.syph[trans[, 2]] %in% c(1,2,3) & !(stage.syph[trans[, 1]] %in% c(1,2,3)) |
     #P2 is infected, P1 has syphilis, P2 does not have syphilis
     status[trans[, 2]] == 1 & !(stage.syph[trans[, 2]] %in% c(1,2,3)) & stage.syph[trans[, 1]] %in% c(1,2,3)))
 
-  df.direct$cell3_syph[sim] <- length(which(
+  df.direct$cell3_syph[i] <- length(which(
     #P1 is infected, P1 has syphilis, P2 does not have syphilis OR
     status[trans[, 1]] == 1 & stage.syph[trans[, 1]] %in% c(1,2,3) & !(stage.syph[trans[, 2]] %in% c(1,2,3)) |
     #P2 is infected, P1 does not have syphilis, P2 has syphilis
     status[trans[, 2]] == 1 & !(stage.syph[trans[, 1]] %in% c(1,2,3)) & stage.syph[trans[, 2]] %in% c(1,2,3)))
 
-  df.direct$cell4_syph[sim] <- length(which(
+  df.direct$cell4_syph[i] <- length(which(
     #P1 is infected, P1 does not have syphilis, P2 does not have syphilis OR
     status[trans[, 1]] == 1 & !(stage.syph[trans[, 1]] %in% c(1,2,3)) & !(stage.syph[trans[, 2]] %in% c(1,2,3)) |
     #P2 is infected, P1 does not have syphilis, P2 does not have syphilis
     status[trans[, 2]] == 1 & !(stage.syph[trans[, 1]] %in% c(1,2,3)) & !(stage.syph[trans[, 2]] %in% c(1,2,3))))
 
-  df.direct$cell1_sti[sim] <- length(which(
+  df.direct$cell1_sti[i] <- length(which(
     #P1 is infected, P1 has urethral STI, P2 has rectal STI OR
     (status[trans[, 1]] == 1 & ((uGC[trans[, 1]] == 1 | uCT[trans[ , 1]] == 1 | stage.syph[trans[, 1]] %in% c(1,2,3))) &
                                   (rGC[trans[, 2]] == 1 | rCT[trans[ , 2]] == 1 | stage.syph[trans[, 2]] %in% c(1,2,3))) |
@@ -564,7 +603,7 @@ hiv_trans_msm <- function(dat, at) {
     (status[trans[, 2]] == 1 & ((uGC[trans[, 1]] == 1 | uCT[trans[ , 1]] == 1 | stage.syph[trans[, 1]] %in% c(1,2,3))) &
                                   (rGC[trans[, 2]] == 1 | rCT[trans[ , 2]] == 1 | stage.syph[trans[, 2]] %in% c(1,2,3)))))
 
-  df.direct$cell2_sti[sim] <- length(which(
+  df.direct$cell2_sti[i] <- length(which(
     #P1 is infected, P1 does not have urethral STI, P2 has rectal STI OR
     (status[trans[, 1]] == 1 & ((uGC[trans[, 1]] == 0 & uCT[trans[, 1]] == 0 & !(stage.syph[trans[, 1]] %in% c(1,2,3)))) &
                                   (rGC[trans[, 2]] == 1 | rCT[trans[, 2]] == 1 | stage.syph[trans[, 2]] %in% c(1,2,3))) |
@@ -572,7 +611,7 @@ hiv_trans_msm <- function(dat, at) {
     (status[trans[, 2]] == 1 & ((uGC[trans[, 1]] == 1 | uCT[trans[, 1]] == 1 | stage.syph[trans[, 1]] %in% c(1,2,3))) &
                                     (rGC[trans[, 2]] == 0 & rCT[trans[, 2]] == 0 & !(stage.syph[trans[, 2]] %in% c(1,2,3))))))
 
-  df.direct$cell3_sti[sim] <- length(which(
+  df.direct$cell3_sti[i] <- length(which(
     #P1 is infected, P1 has urethral STI, P2 does not have rectal STI OR
     (status[trans[, 1]] == 1 & ((uGC[trans[, 1]] == 1 | uCT[trans[, 1]] == 1 | stage.syph[trans[, 1]] %in% c(1,2,3))) &
                                   (rGC[trans[, 2]] == 0 & rCT[trans[, 2]] == 0 & !(stage.syph[trans[, 2]] %in% c(1,2,3)))) |
@@ -580,7 +619,7 @@ hiv_trans_msm <- function(dat, at) {
     (status[trans[, 2]] == 1 & ((uGC[trans[, 1]] == 0 & uCT[trans[, 1]] == 0 & !(stage.syph[trans[, 1]] %in% c(1,2,3)))) &
                                     (rGC[trans[, 2]] == 1 | rCT[trans[, 2]] == 1 | stage.syph[trans[, 2]] %in% c(1,2,3)))))
 
-  df.direct$cell4_sti[sim] <- length(which(
+  df.direct$cell4_sti[i] <- length(which(
     #P1 is infected, P1 does not have urethral STI, P2 does not have rectal STI OR
     (status[trans[, 1]] == 1 & ((uGC[trans[, 1]] == 0 & uCT[trans[, 1]] == 0 & !(stage.syph[trans[, 1]] %in% c(1,2,3)))) &
                                   (rGC[trans[, 2]] == 0 & rCT[trans[, 2]] == 0 & !(stage.syph[trans[, 2]] %in% c(1,2,3)))) |
@@ -589,14 +628,17 @@ hiv_trans_msm <- function(dat, at) {
                                   (rGC[trans[, 2]] == 0 & rCT[trans[, 2]] == 0 & !(stage.syph[trans[, 2]] %in% c(1,2,3))))))
 
   # Summary Output
-  df.direct$incid[sim] <- length(infected)
-  df.direct$ir100[sim] <- ifelse(sum(status == 0, na.rm = TRUE) > 0, (length(infected) /
+  df.direct$incid[i] <- length(infected)
+  df.direct$ir100[i] <- ifelse(sum(status == 0, na.rm = TRUE) > 0, (length(infected) /
                                                                      sum(status == 0, na.rm = TRUE)) * 5200, 0)
 
-  df.direct$trans.main[sim] <- sum(inf.type == 1)
-  df.direct$trans.pers[sim] <- sum(inf.type == 2)
-  df.direct$trans.inst[sim] <- sum(inf.type == 3)
+  df.direct$trans.main[i] <- sum(inf.type == 1)
+  df.direct$trans.pers[i] <- sum(inf.type == 2)
+  df.direct$trans.inst[i] <- sum(inf.type == 3)
 
+  }
+  df.direct <<- df.direct
+  
   return(dat)
 }
 
