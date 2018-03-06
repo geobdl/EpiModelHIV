@@ -42,8 +42,12 @@ trans_msm <- function(dat, at) {
   ccr5 <- dat$attr$ccr5
   circ <- dat$attr$circ
   status <- dat$attr$status
+
   prepStat <- dat$attr$prepStat
   prepClass <- dat$attr$prepClass
+  prepStat.la <- dat$attr$prepStat.la
+  prepLA.dlevel <- dat$attr$prepLA.dlevel
+
   rGC <- dat$attr$rGC
   uGC <- dat$attr$uGC
   rCT <- dat$attr$rCT
@@ -62,6 +66,7 @@ trans_msm <- function(dat, at) {
   circ.rr <- dat$param$circ.rr
   ccr5.heteroz.rr <- dat$param$ccr5.heteroz.rr
   prep.hr <- dat$param$prep.class.hr
+  prep.la.hr <- dat$param$prep.la.hr
   hiv.ugc.rr <- dat$param$hiv.ugc.rr
   hiv.uct.rr <- dat$param$hiv.uct.rr
   hiv.rgc.rr <- dat$param$hiv.rgc.rr
@@ -133,7 +138,7 @@ trans_msm <- function(dat, at) {
   ip.op.prep.la.loww <- which(ip.prep.la == 1 & ip.prep.dl >= dl.cuts[1] & ip.prep.dl < dl.cuts[2])
   ip.op.prep.la.none <- which(ip.prep.la == 1 & ip.prep.dl < dl.cuts[1])
 
-  # hr/rr = c(low, med, high); c(0.25, 0.50, 0.98)
+  # hr/rr = c(low, med, high)
   ip.tlo[ip.op.prep.la.high] <- ip.tlo[ip.op.prep.la.high] + log(prep.la.hr[3])
   ip.tlo[ip.op.prep.la.medm] <- ip.tlo[ip.op.prep.la.medm] + log(prep.la.hr[2])
   ip.tlo[ip.op.prep.la.loww] <- ip.tlo[ip.op.prep.la.loww] + log(prep.la.hr[1])
