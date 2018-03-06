@@ -95,6 +95,8 @@ trans_msm <- function(dat, at) {
   ip.ccr5 <- ccr5[disc.ip[, 2]]
   ip.prep <- prepStat[disc.ip[, 2]]
   ip.prepcl <- prepClass[disc.ip[, 2]]
+  ip.prep.la <- prepStat.la[disc.ip[, 2]]
+  ip.prep.dl <- prepLA.dlevel[disc.ip[, 2]]
   ip.rGC <- rGC[disc.ip[, 2]]
   ip.rCT <- rCT[disc.ip[, 2]]
 
@@ -122,6 +124,21 @@ trans_msm <- function(dat, at) {
   # PrEP, by adherence class
   ip.on.prep <- which(ip.prep == 1)
   ip.tlo[ip.on.prep] <- ip.tlo[ip.on.prep] + log(prep.hr[ip.prepcl[ip.on.prep]])
+
+  # LA PrEP, by drug level
+  dl.cuts <- 0.166 * 2:4
+
+  ip.op.prep.la.high <- which(ip.prep.la == 1 & ip.prep.dl >= dl.cuts[3])
+  ip.op.prep.la.medm <- which(ip.prep.la == 1 & ip.prep.dl >= dl.cuts[2] & ip.prep.dl < dl.cuts[3])
+  ip.op.prep.la.loww <- which(ip.prep.la == 1 & ip.prep.dl >= dl.cuts[1] & ip.prep.dl < dl.cuts[2])
+  ip.op.prep.la.none <- which(ip.prep.la == 1 & ip.prep.dl < dl.cuts[1])
+
+  # hr/rr = c(low, med, high); c(0.25, 0.50, 0.98)
+  ip.tlo[ip.op.prep.la.high] <- ip.tlo[ip.op.prep.la.high] + log(prep.la.hr[3])
+  ip.tlo[ip.op.prep.la.medm] <- ip.tlo[ip.op.prep.la.medm] + log(prep.la.hr[2])
+  ip.tlo[ip.op.prep.la.loww] <- ip.tlo[ip.op.prep.la.loww] + log(prep.la.hr[1])
+
+  ## TODO: copy down below
 
   # Acute-stage multipliers
   isAcute <- which(ip.stage %in% 1:2)
