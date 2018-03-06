@@ -29,24 +29,37 @@ prep_msm <- function(dat, at) {
   # Attributes
   active <- dat$attr$active
   status <- dat$attr$status
-  race <- dat$attr$race
   diag.status <- dat$attr$diag.status
   lnt <- dat$attr$last.neg.test
+
   prepElig <- dat$attr$prepElig
+  prepElig.la <- dat$attr$prepElig.la
 
   prepStat <- dat$attr$prepStat
+  prepStat.la <- dat$attr$prepStat.la
+
   prepClass <- dat$attr$prepClass
+  prepClass.la <- dat$attr$prepClass.la
+
   prepLastRisk <- dat$attr$prepLastRisk
   prepStartTime <- dat$attr$prepStartTime
   prepLastStiScreen <- dat$attr$prepLastStiScreen
 
+  prepTimeLastInj <- dat$attr$prepTimeLastInj
+
   # Parameters
   prep.coverage <- dat$param$prep.coverage
+  prep.coverage.la <- dat$param$prep.coverage.la
 
   prep.risk.reassess.method <- dat$param$prep.risk.reassess.method
+
   prep.adhr.dist <- dat$param$prep.adhr.dist
+  prep.adhr.dist.la <- dat$param$prep.adhr.dist.la
+
   prep.discont.rate <- dat$param$prep.discont.rate
 
+  prep.hadr.int <- dat$param$prep.hadr.int
+  prep.ladr.int <- dat$param$prep.ladr.int
 
 
   ## Eligibility ---------------------------------------------------------------
@@ -55,7 +68,30 @@ prep_msm <- function(dat, at) {
   idsEligStart <- which(active == 1 &
                         status == 0 &
                         prepStat == 0 &
+                        prepStat.la == 0 &
                         lnt == at)
+
+  if (dat$param$prep.replace.mod == "all") {
+    idsEligStart.la <- which(active == 1 &
+                             status == 0 &
+                             prepStat == 0 &
+                             prepStat.la == 0 &
+                             lnt == at)
+  } else if (dat$param$prep.replace.mod == "curr.oral") {
+    idsEligStart.la <- which(active == 1 &
+                             status == 0 &
+                             prepStat == 1 &
+                             prepStat.la == 0 &
+                             lnt == at)
+  } else if (dat$param$prep.replace.mod == "curr.oral.ladhr") {
+    idsEligStart.la <- which(active == 1 &
+                             status == 0 &
+                             prepStat == 1 &
+                             prepStat.la == 0 &
+                             prepClass == 1 &
+                             lnt == at)
+  }
+
 
   # Core eligiblity
   ind1 <- dat$attr$prep.ind.uai.mono
@@ -67,7 +103,10 @@ prep_msm <- function(dat, at) {
   idsIndic <- which(ind1 >= twind | ind2 >= twind | ind3 >= twind | ind4 >= twind)
 
   idsEligStart <- intersect(idsIndic, idsEligStart)
+  idsEligStart.la <- intersect(idsIndic, idsEligStart.la)
+
   prepElig[idsEligStart] <- 1
+  prepElig.la[idsEligStart.la] <- 1
 
 
   ## Stoppage ------------------------------------------------------------------
@@ -79,6 +118,7 @@ prep_msm <- function(dat, at) {
                       (ind4 < twind | is.na(ind4)))
 
   prepElig[idsNoIndic] <- 0
+  prepElig.la[idsNoIndic] <- 0
 
   # Risk reassessment rule
   if (prep.risk.reassess.method == "none") {
@@ -88,26 +128,35 @@ prep_msm <- function(dat, at) {
     prepLastRisk[idsRiskAssess] <- at
     idsStpInd <- intersect(idsNoIndic, idsRiskAssess)
   } else if (prep.risk.reassess.method == "year") {
-    idsRiskAssess <- which(active == 1 & prepStat == 1 & lnt == at & (at - prepLastRisk) >= 52)
+    idsRiskAssess <- which(active == 1 & prepStat == 1 & lnt == at &
+                             (at - prepLastRisk) >= 52)
     prepLastRisk[idsRiskAssess] <- at
     idsStpInd <- intersect(idsNoIndic, idsRiskAssess)
   }
 
   # Random (memoryless) discontinuation
-  idsEligStpRand <- which(active == 1 & prepStat == 1)
+  ## TO ADD: different discontinuation rates by formulation
+  idsEligStpRand <- which(active == 1 & (prepStat == 1 | prepStat.la == 1))
   vecStpRand <- rbinom(length(idsEligStpRand), 1, prep.discont.rate)
   idsStpRand <- idsEligStpRand[which(vecStpRand == 1)]
 
   # Diagnosis
-  idsStpDx <- which(active == 1 & prepStat == 1 & diag.status == 1)
+  idsStpDx <- which(active == 1 & (prepStat == 1 | prepStat.la == 1) & diag.status == 1)
 
   # Death
-  idsStpDth <- which(active == 0 & prepStat == 1)
+  idsStpDth <- which(active == 0 & (prepStat == 1 | prepStat.la == 1))
 
   # Reset PrEP status
   idsStp <- c(idsStpInd, idsStpRand, idsStpDx, idsStpDth)
-  prepStat[idsStp] <- 0
-  prepElig[idsStp] <- 0
+  idsStp.oral <- intersect(idsStp, which(prepStat == 1))
+  idsStp.la <- intersect(idsStp, which(prepStat.la == 1))
+
+  prepStat[idsStp.oral] <- 0
+  prepElig[idsStp.oral] <- 0
+
+  prepStat.la[idsStp.la] <- 0
+  prepElig.la[idsStp.la] <- 0
+
   prepLastRisk[idsStp] <- NA
   prepStartTime[idsStp] <- NA
   prepLastStiScreen[idsStp] <- NA
@@ -115,13 +164,13 @@ prep_msm <- function(dat, at) {
 
   ## Initiation ----------------------------------------------------------------
 
+  # Oral
   prepCov <- sum(prepStat == 1, na.rm = TRUE)/sum(prepElig == 1, na.rm = TRUE)
   prepCov <- ifelse(is.nan(prepCov), 0, prepCov)
 
   nEligSt <- length(idsEligStart)
   nStart <- max(0, min(nEligSt, round((prep.coverage - prepCov) *
                                         sum(prepElig == 1, na.rm = TRUE))))
-
   idsStart <- NULL
   if (nStart > 0) {
     idsStart <- ssample(idsEligStart, nStart)
@@ -135,8 +184,76 @@ prep_msm <- function(dat, at) {
     # PrEP adherence class
     needPC <- which(is.na(prepClass[idsStart]))
     prepClass[idsStart[needPC]] <- sample(x = 1:3, size = length(needPC),
-                                              replace = TRUE, prob = prep.adhr.dist)
+                                          replace = TRUE, prob = prep.adhr.dist)
   }
+
+
+  # Injectable
+  prepCov.la <- sum(prepStat.la == 1, na.rm = TRUE)/sum(prepElig.la == 1, na.rm = TRUE)
+  prepCov.la <- ifelse(is.nan(prepCov.la), 0, prepCov.la)
+
+  nEligSt.la <- length(idsEligStart.la)
+  nStart.la <- max(0, min(nEligSt.la, round((prep.coverage.la - prepCov.la) *
+                                        sum(prepElig.la == 1, na.rm = TRUE))))
+  idsStart.la <- NULL
+  if (nStart.la > 0) {
+    idsStart.la <- ssample(idsEligStart.la, nStart.la)
+  }
+
+  # Attributes
+  if (length(idsStart) > 0) {
+    prepStartTime[idsStart.la] <- at
+    prepLastRisk[idsStart.la] <- at
+
+    # PrEP adherence class
+    needPC <- which(is.na(prepClass.la[idsStart.la]))
+    prepClass.la[idsStart.la[needPC]] <- sample(x = 1:2, size = length(needPC),
+                                          replace = TRUE, prob = prep.adhr.dist.la)
+  }
+
+
+  # Injection Process -------------------------------------------------------
+
+  # Started Today
+  start.today <- which(prepStat.la == 1 & prepStartTime == at)
+  prepTimeLastInj[start.today] <- at
+
+  last.inj <- at - prepTimeLastInj
+
+  # High Adherence
+  idsLA.hadr <- which(prepStat.la == 1 & prepClass.la == 2)
+  get.injection.hadr <- intersect(idsLA.hadr, which(last.inj == prep.hadr.int))
+
+  # Low Adherence
+  idsLA.ladr <- which(prepStat.la == 1 & prepClass.la == 1)
+  get.injection.ladr <- intersect(idsLA.ladr, which(last.inj == prep.ladr.int))
+
+  get.injection <- union(get.injection.hadr, get.injection.ladr)
+
+  prepTimeLastInj[get.injection] <- at
+
+
+
+  # Drug Level --------------------------------------------------------------
+
+  # attributes
+  prepLA.dlevel <- dat$attr$prepLA.dlevel
+  prepLA.dlevel.int <- dat$attr$prepLA.dlevel.int
+
+
+  # parameters
+  intcept <- dat$param$prepla.dlevel.int # 4.5
+  intcept.err <- dat$param$prepla.dlevel.int.err # 2.5/3
+  slope <- dat$param$prepla.dlevel.slope # 25
+
+  # set dlevel.int for newly injected
+  ## TODO: constrain as positive
+  prepLA.dlevel.int[start.today] <- rnorm(length(start.today), intcept, intcept.err)
+
+  # update dlevel for all active users
+  prepLA.dlevel <- prepLA.dlevel.int * 10^(-(1/slope)*last.inj)
+
+  ## TODO: make sure these get set to NA when LA PrEP stops
 
 
   ## Output --------------------------------------------------------------------
@@ -144,10 +261,16 @@ prep_msm <- function(dat, at) {
   # Attributes
 
   dat$attr$prepStat <- prepStat
-  dat$attr$prepStartTime <- prepStartTime
   dat$attr$prepClass <- prepClass
+
+  dat$attr$prepStat.la <- prepStat.la
+  dat$attr$prepClass.la <- prepClass.la
+
+  dat$attr$prepStartTime <- prepStartTime
   dat$attr$prepLastRisk <- prepLastRisk
   dat$attr$prepLastStiScreen <- prepLastStiScreen
+
+  dat$attr$prepTimeLastInj <- prepTimeLastInj
 
   # Summary stats
 
