@@ -117,6 +117,11 @@ initialize_msm <- function(x, param, init, control, s) {
   dat$attr$prepLastRisk <- rep(NA, num)
   dat$attr$prepLastStiScreen <- rep(NA, num)
 
+  dat$attr$prepStat.la <- rep(0, num)
+  dat$attr$prepClass.la <- rep(NA, num)
+  dat$attr$prepLA.dlevel <- rep(NA, num)
+  dat$attr$prepLA.dlevel.int <- rep(NA, num)
+
   # One-off AI class
   inst.ai.class <- rep(NA, num)
   ncl <- param$num.inst.ai.classes
