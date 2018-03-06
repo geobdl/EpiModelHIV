@@ -435,11 +435,27 @@ param_msm <- function(nwstats,
                       prep.access.W = 0.95,
                       prep.rx.B = 0.63,
                       prep.rx.W = 0.73,
-                      prep.adhr.dist.B = reallocate_pcp(reall = 0.598 - 0.784),
-                      prep.adhr.dist.W = reallocate_pcp(reall = 0.930 - 0.784),
+
                       prep.class.hr = c(0.69, 0.19, 0.02),
-                      prep.discont.rate.B = 1-(2^(-1/406)),
-                      prep.discont.rate.W = 1-(2^(-1/1155)),
+
+                      # new prep mod parameters
+                      prep.coverage = 0,
+                      prep.coverage.la = 0,
+
+                      prep.adhr.dist = c(0.0887199, 0.1267427, 0.7845374),
+                      prep.adhr.dist.la = c(0.0887199, 0.1267427, 0.7845374),
+
+                      prep.discont.rate = 1-(2^(-1/781)),
+
+                      prep.hadr.int = 8 * 7,
+                      prep.ladr.int = 12 * 7,
+
+                      prepla.dlevel.int = 4.5,
+                      prepla.dlevel.int.err = 2.5/3,
+                      prepla.dlevel.slope = 25,
+
+                      # new trans mod parameters
+                      prep.la.hr = c(0.75, 0.50, 0.02),
 
                       prep.tst.int = 90,
                       prep.risk.int = 182,
