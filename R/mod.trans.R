@@ -143,8 +143,6 @@ trans_msm <- function(dat, at) {
   ip.tlo[ip.op.prep.la.medm] <- ip.tlo[ip.op.prep.la.medm] + log(prep.la.hr[2])
   ip.tlo[ip.op.prep.la.loww] <- ip.tlo[ip.op.prep.la.loww] + log(prep.la.hr[1])
 
-  ## TODO: copy down below
-
   # Acute-stage multipliers
   isAcute <- which(ip.stage %in% 1:2)
   ip.tlo[isAcute] <- ip.tlo[isAcute] + log(acute.rr)
@@ -181,6 +179,8 @@ trans_msm <- function(dat, at) {
   rp.ccr5 <- ccr5[disc.rp[, 1]]
   rp.prep <- prepStat[disc.rp[, 1]]
   rp.prepcl <- prepClass[disc.rp[, 1]]
+  rp.prep.la <- prepStat.la[disc.ip[, 1]]
+  rp.prep.dl <- prepLA.dlevel[disc.ip[, 1]]
   rp.uGC <- uGC[disc.rp[, 1]]
   rp.uCT <- uCT[disc.rp[, 1]]
 
@@ -212,6 +212,17 @@ trans_msm <- function(dat, at) {
   # PrEP, by adherence class
   rp.on.prep <- which(rp.prep == 1)
   rp.tlo[rp.on.prep] <- rp.tlo[rp.on.prep] + log(prep.hr[rp.prepcl[rp.on.prep]])
+
+  # LA PrEP, by drug level
+  rp.op.prep.la.high <- which(rp.prep.la == 1 & rp.prep.dl >= dl.cuts[3])
+  rp.op.prep.la.medm <- which(rp.prep.la == 1 & rp.prep.dl >= dl.cuts[2] & rp.prep.dl < dl.cuts[3])
+  rp.op.prep.la.loww <- which(rp.prep.la == 1 & rp.prep.dl >= dl.cuts[1] & rp.prep.dl < dl.cuts[2])
+  rp.op.prep.la.none <- which(rp.prep.la == 1 & rp.prep.dl < dl.cuts[1])
+
+  # hr/rr = c(low, med, high)
+  rp.tlo[ip.op.prep.la.high] <- rp.tlo[rp.op.prep.la.high] + log(prep.la.hr[3])
+  rp.tlo[ip.op.prep.la.medm] <- rp.tlo[rp.op.prep.la.medm] + log(prep.la.hr[2])
+  rp.tlo[ip.op.prep.la.loww] <- rp.tlo[rp.op.prep.la.loww] + log(prep.la.hr[1])
 
   # Acute-stage multipliers
   isAcute <- which(rp.stage %in% 1:2)
