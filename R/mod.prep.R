@@ -48,6 +48,8 @@ prep_msm <- function(dat, at) {
   prepTimeLastInj <- dat$attr$prepTimeLastInj
 
   # Parameters
+  prep.replace.mod <- dat$param$prep.replace.mod
+
   prep.coverage <- dat$param$prep.coverage
   prep.coverage.la <- dat$param$prep.coverage.la
 
@@ -71,19 +73,19 @@ prep_msm <- function(dat, at) {
                         prepStat.la == 0 &
                         lnt == at)
 
-  if (dat$param$prep.replace.mod == "all") {
+  if (prep.replace.mod == "all") {
     idsEligStart.la <- which(active == 1 &
                              status == 0 &
                              prepStat == 0 &
                              prepStat.la == 0 &
                              lnt == at)
-  } else if (dat$param$prep.replace.mod == "curr.oral") {
+  } else if (prep.replace.mod == "curr.oral") {
     idsEligStart.la <- which(active == 1 &
                              status == 0 &
                              prepStat == 1 &
                              prepStat.la == 0 &
                              lnt == at)
-  } else if (dat$param$prep.replace.mod == "curr.oral.ladhr") {
+  } else if (prep.replace.mod == "curr.oral.ladhr") {
     idsEligStart.la <- which(active == 1 &
                              status == 0 &
                              prepStat == 1 &
@@ -239,7 +241,6 @@ prep_msm <- function(dat, at) {
   # attributes
   prepLA.dlevel <- dat$attr$prepLA.dlevel
   prepLA.dlevel.int <- dat$attr$prepLA.dlevel.int
-
 
   # parameters
   intcept <- dat$param$prepla.dlevel.int # 4.5
