@@ -219,16 +219,6 @@
 #' @param prep.class.hr The hazard ratio for infection per act associated with each
 #'        level of adherence (from Grant).
 #'
-#' @param prep.aware.B Proportion of black men who are aware of PrEP.
-#' @param prep.aware.W Proportion of white men who are aware of PrEP.
-#' @param prep.access.B Proportion of black men aware of PrEP who have access to
-#'        a PrEP provider.
-#' @param prep.access.W Proportion of white men aware of PrEP who have access to
-#'        a PrEP provider.
-#' @param prep.rx.B Propotion of black men with access to a PrEP provider and with
-#'        current indications for PrEP who receive a PrEP prescription.
-#' @param prep.rx.W Proportion of white men with access to a PrEP provide and with
-#'        current indications for PrEP who receive a PrEP prescription.
 #' @param prep.discont.rate.B Rate of random discontinuation from PrEP for black men.
 #' @param prep.discont.rate.W Rate of random discontinuation from PrEP for white men.
 #'
@@ -319,7 +309,7 @@
 #' @export
 #'
 param_msm <- function(nwstats,
-                      race.method = 2,
+                      race.method = 1,
                       last.neg.test.B.int = 301,
                       last.neg.test.W.int = 315,
                       mean.test.B.int = 301,
@@ -427,39 +417,24 @@ param_msm <- function(nwstats,
                       vv.iev.BW.prob = 0.56,
                       vv.iev.WW.prob = 0.49,
 
+                      riskh.start = Inf,
                       prep.start = Inf,
-
-                      prep.aware.B = 0.5,
-                      prep.aware.W = 0.5,
-                      prep.access.B = 0.76,
-                      prep.access.W = 0.95,
-                      prep.rx.B = 0.63,
-                      prep.rx.W = 0.73,
-
+                      prep.replace.mod = "all",
                       prep.class.hr = c(0.69, 0.19, 0.02),
-
-                      # new prep mod parameters
                       prep.coverage = 0,
                       prep.coverage.la = 0,
-
-                      prep.adhr.dist = c(0.0887199, 0.1267427, 0.7845374),
-                      prep.adhr.dist.la = c(0.0887199, 0.1267427, 0.7845374),
-
+                      prep.adhr.dist = c(0.089, 0.127, 0.785),
+                      prep.adhr.dist.la = c(0.089, 0.127, 0.785),
                       prep.discont.rate = 1-(2^(-1/781)),
-
                       prep.hadr.int = 8 * 7,
                       prep.ladr.int = 12 * 7,
-
                       prepla.dlevel.int = 4.5,
                       prepla.dlevel.int.err = 2.5/3,
                       prepla.dlevel.slope = 25,
-
-                      # new trans mod parameters
                       prep.la.hr = c(0.75, 0.50, 0.02),
-
                       prep.tst.int = 90,
                       prep.risk.int = 182,
-                      prep.risk.reassess.method = "year", # inst, year
+                      prep.risk.reassess.method = "year",
 
                       rcomp.prob = 0.41,
                       rcomp.adh.groups = 2:3,
