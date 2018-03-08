@@ -224,11 +224,11 @@ prep_msm <- function(dat, at) {
 
   # High Adherence
   idsLA.hadr <- which(prepStat.la == 1 & prepClass.la == 2)
-  get.injection.hadr <- intersect(idsLA.hadr, which(last.inj == prep.hadr.int))
+  get.injection.hadr <- intersect(idsLA.hadr, which(last.inj >= prep.hadr.int))
 
   # Low Adherence
   idsLA.ladr <- which(prepStat.la == 1 & prepClass.la == 1)
-  get.injection.ladr <- intersect(idsLA.ladr, which(last.inj == prep.ladr.int))
+  get.injection.ladr <- intersect(idsLA.ladr, which(last.inj >= prep.ladr.int))
 
   get.injection <- union(get.injection.hadr, get.injection.ladr)
 
