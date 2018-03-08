@@ -251,8 +251,7 @@ prep_msm <- function(dat, at) {
   slope <- dat$param$prepla.dlevel.slope # 25
 
   # set dlevel.int for newly injected
-  ## TODO: constrain as positive
-  prepLA.dlevel.int[start.today] <- rnorm(length(start.today), intcept, intcept.err)
+  prepLA.dlevel.int[start.today] <- pmax(0.1, rnorm(length(start.today), intcept, intcept.err))
 
   # update dlevel for all active users
   prepLA.dlevel <- prepLA.dlevel.int * 10^(-(1/slope)*last.inj)
