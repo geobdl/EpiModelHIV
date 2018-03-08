@@ -63,7 +63,6 @@ prep_msm <- function(dat, at) {
   prep.hadr.int <- dat$param$prep.hadr.int
   prep.ladr.int <- dat$param$prep.ladr.int
 
-
   ## Eligibility ---------------------------------------------------------------
 
   # Core indications
@@ -238,6 +237,8 @@ prep_msm <- function(dat, at) {
 
   prepTimeLastInj[get.injection] <- at
 
+  last.inj <- at - prepTimeLastInj
+
 
   # Drug Level --------------------------------------------------------------
 
@@ -246,17 +247,15 @@ prep_msm <- function(dat, at) {
   prepLA.dlevel.int <- dat$attr$prepLA.dlevel.int
 
   # parameters
-  intcept <- dat$param$prepla.dlevel.intcpt # 4.5
-  intcept.err <- dat$param$prepla.dlevel.intcpt.err # 2.5/3
+  icept <- dat$param$prepla.dlevel.icpt # 4.5
+  icept.err <- dat$param$prepla.dlevel.icpt.err # 2.5/3
   slope <- dat$param$prepla.dlevel.slope # 25
 
   # set dlevel.int for newly injected
-  prepLA.dlevel.int[start.today] <- pmax(0.1, rnorm(length(start.today), intcept, intcept.err))
+  prepLA.dlevel.int[start.today] <- pmax(0.1, rnorm(length(start.today), icept, icept.err))
 
   # update dlevel for all active users
   prepLA.dlevel <- prepLA.dlevel.int * 10^(-(1/slope)*last.inj)
-
-  ## TODO: make sure these get set to NA when LA PrEP stops
 
 
   ## Output --------------------------------------------------------------------
@@ -274,8 +273,9 @@ prep_msm <- function(dat, at) {
   dat$attr$prepLastStiScreen <- prepLastStiScreen
 
   dat$attr$prepTimeLastInj <- prepTimeLastInj
+  dat$attr$prepLA.dlevel <- prepLA.dlevel
+  dat$attr$prepLA.dlevel.int <- prepLA.dlevel.int
 
-  # Summary stats
 
   return(dat)
 }
