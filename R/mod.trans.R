@@ -109,7 +109,7 @@ trans_msm <- function(dat, at) {
   ip.tprob <- URAI.prob * 2.45^(ip.vl - 4.5)
 
   # Transform to log odds
-  ip.tlo <- log(ip.tprob/(1-ip.tprob))
+  ip.tlo <- log(ip.tprob/(1 - ip.tprob))
 
   # Condom use
   not.UAI <- which(disc.ip[, "uai"] == 0)
@@ -136,7 +136,6 @@ trans_msm <- function(dat, at) {
   ip.op.prep.la.high <- which(ip.prep.la == 1 & ip.prep.dl >= dl.cuts[3])
   ip.op.prep.la.medm <- which(ip.prep.la == 1 & ip.prep.dl >= dl.cuts[2] & ip.prep.dl < dl.cuts[3])
   ip.op.prep.la.loww <- which(ip.prep.la == 1 & ip.prep.dl >= dl.cuts[1] & ip.prep.dl < dl.cuts[2])
-  ip.op.prep.la.none <- which(ip.prep.la == 1 & ip.prep.dl < dl.cuts[1])
 
   # hr/rr = c(low, med, high)
   ip.tlo[ip.op.prep.la.high] <- ip.tlo[ip.op.prep.la.high] + log(prep.la.hr[3])
@@ -188,7 +187,7 @@ trans_msm <- function(dat, at) {
   rp.tprob <- UIAI.prob * 2.45^(rp.vl - 4.5)
 
   # Transform to log odds
-  rp.tlo <- log(rp.tprob/(1-rp.tprob))
+  rp.tlo <- log(rp.tprob/(1 - rp.tprob))
 
   # Circumcision
   rp.tlo[rp.circ == 1] <- rp.tlo[rp.circ == 1] + log(circ.rr)
@@ -217,7 +216,6 @@ trans_msm <- function(dat, at) {
   rp.op.prep.la.high <- which(rp.prep.la == 1 & rp.prep.dl >= dl.cuts[3])
   rp.op.prep.la.medm <- which(rp.prep.la == 1 & rp.prep.dl >= dl.cuts[2] & rp.prep.dl < dl.cuts[3])
   rp.op.prep.la.loww <- which(rp.prep.la == 1 & rp.prep.dl >= dl.cuts[1] & rp.prep.dl < dl.cuts[2])
-  rp.op.prep.la.none <- which(rp.prep.la == 1 & rp.prep.dl < dl.cuts[1])
 
   # hr/rr = c(low, med, high)
   rp.tlo[ip.op.prep.la.high] <- rp.tlo[rp.op.prep.la.high] + log(prep.la.hr[3])
