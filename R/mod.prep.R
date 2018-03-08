@@ -66,49 +66,13 @@ prep_msm <- function(dat, at) {
 
   ## Eligibility ---------------------------------------------------------------
 
-  # Base eligibility
-  idsEligStart <- which(active == 1 &
-                        status == 0 &
-                        prepStat == 0 &
-                        prepStat.la == 0 &
-                        lnt == at)
-
-  if (prep.replace.mod == "all") {
-    idsEligStart.la <- which(active == 1 &
-                             status == 0 &
-                             prepStat == 0 &
-                             prepStat.la == 0 &
-                             lnt == at)
-  } else if (prep.replace.mod == "curr.oral") {
-    idsEligStart.la <- which(active == 1 &
-                             status == 0 &
-                             prepStat == 1 &
-                             prepStat.la == 0 &
-                             lnt == at)
-  } else if (prep.replace.mod == "curr.oral.ladhr") {
-    idsEligStart.la <- which(active == 1 &
-                             status == 0 &
-                             prepStat == 1 &
-                             prepStat.la == 0 &
-                             prepClass == 1 &
-                             lnt == at)
-  }
-
-
-  # Core eligiblity
+  # Core indications
   ind1 <- dat$attr$prep.ind.uai.mono
   ind2 <- dat$attr$prep.ind.uai.nmain
   ind3 <- dat$attr$prep.ind.ai.sd
   ind4 <- dat$attr$prep.ind.sti
 
   twind <- at - dat$param$prep.risk.int
-  idsIndic <- which(ind1 >= twind | ind2 >= twind | ind3 >= twind | ind4 >= twind)
-
-  idsEligStart <- intersect(idsIndic, idsEligStart)
-  idsEligStart.la <- intersect(idsIndic, idsEligStart.la)
-
-  prepElig[idsEligStart] <- 1
-  prepElig.la[idsEligStart.la] <- 1
 
 
   ## Stoppage ------------------------------------------------------------------
@@ -137,7 +101,6 @@ prep_msm <- function(dat, at) {
   }
 
   # Random (memoryless) discontinuation
-  ## TO ADD: different discontinuation rates by formulation
   idsEligStpRand <- which(active == 1 & (prepStat == 1 | prepStat.la == 1))
   vecStpRand <- rbinom(length(idsEligStpRand), 1, prep.discont.rate)
   idsStpRand <- idsEligStpRand[which(vecStpRand == 1)]
@@ -166,7 +129,21 @@ prep_msm <- function(dat, at) {
 
   ## Initiation ----------------------------------------------------------------
 
-  # Oral
+  ## Oral ##
+
+  # Indications
+  idsEligStart <- which(active == 1 &
+                        status == 0 &
+                        prepStat == 0 &
+                        prepStat.la == 0 &
+                        lnt == at)
+
+  idsIndic <- which(ind1 >= twind | ind2 >= twind | ind3 >= twind | ind4 >= twind)
+
+  idsEligStart <- intersect(idsIndic, idsEligStart)
+
+  prepElig[idsEligStart] <- 1
+
   prepCov <- sum(prepStat == 1, na.rm = TRUE)/sum(prepElig == 1, na.rm = TRUE)
   prepCov <- ifelse(is.nan(prepCov), 0, prepCov)
 
@@ -180,6 +157,7 @@ prep_msm <- function(dat, at) {
 
   # Attributes
   if (length(idsStart) > 0) {
+    prepStat[idsStart] <- 1
     prepStartTime[idsStart] <- at
     prepLastRisk[idsStart] <- at
 
@@ -190,7 +168,32 @@ prep_msm <- function(dat, at) {
   }
 
 
-  # Injectable
+  ## Injectable ##
+
+  if (prep.replace.mod == "all") {
+    idsEligStart.la <- which(active == 1 &
+                             status == 0 &
+                             prepStat == 0 &
+                             prepStat.la == 0 &
+                             lnt == at)
+  } else if (prep.replace.mod == "curr.oral") { ## TODO: restrict to PrEP start time < at
+    idsEligStart.la <- which(active == 1 &
+                             status == 0 &
+                             prepStat == 1 &
+                             prepStat.la == 0 &
+                             lnt == at)
+  } else if (prep.replace.mod == "curr.oral.ladhr") {
+    idsEligStart.la <- which(active == 1 &
+                             status == 0 &
+                             prepStat == 1 &
+                             prepStat.la == 0 &
+                             prepClass == 1 &
+                             lnt == at)
+  }
+
+  idsEligStart.la <- intersect(idsIndic, idsEligStart.la)
+  prepElig.la[idsEligStart.la] <- 1
+
   prepCov.la <- sum(prepStat.la == 1, na.rm = TRUE)/sum(prepElig.la == 1, na.rm = TRUE)
   prepCov.la <- ifelse(is.nan(prepCov.la), 0, prepCov.la)
 
