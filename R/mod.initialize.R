@@ -119,6 +119,8 @@ initialize_msm <- function(x, param, init, control, s) {
 
   dat$attr$prepStat.la <- rep(0, num)
   dat$attr$prepClass.la <- rep(NA, num)
+  dat$attr$prepElig.la <- rep(NA, num)
+  dat$attr$prepTimeLastInj <- rep(NA, num)
   dat$attr$prepLA.dlevel <- rep(NA, num)
   dat$attr$prepLA.dlevel.int <- rep(NA, num)
 
