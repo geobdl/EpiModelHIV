@@ -206,7 +206,8 @@ prep_msm <- function(dat, at) {
   }
 
   # Attributes
-  if (length(idsStart) > 0) {
+  if (length(idsStart.la) > 0) {
+    prepStat.la[idsStart.la] <- 1
     prepStartTime[idsStart.la] <- at
     prepLastRisk[idsStart.la] <- at
 
@@ -238,7 +239,6 @@ prep_msm <- function(dat, at) {
   prepTimeLastInj[get.injection] <- at
 
 
-
   # Drug Level --------------------------------------------------------------
 
   # attributes
@@ -246,8 +246,8 @@ prep_msm <- function(dat, at) {
   prepLA.dlevel.int <- dat$attr$prepLA.dlevel.int
 
   # parameters
-  intcept <- dat$param$prepla.dlevel.int # 4.5
-  intcept.err <- dat$param$prepla.dlevel.int.err # 2.5/3
+  intcept <- dat$param$prepla.dlevel.intcpt # 4.5
+  intcept.err <- dat$param$prepla.dlevel.intcpt.err # 2.5/3
   slope <- dat$param$prepla.dlevel.slope # 25
 
   # set dlevel.int for newly injected
