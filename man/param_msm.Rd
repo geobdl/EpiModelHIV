@@ -4,7 +4,7 @@
 \alias{param_msm}
 \title{Epidemic Model Parameters}
 \usage{
-param_msm(nwstats, race.method = 2, last.neg.test.B.int = 301,
+param_msm(nwstats, race.method = 1, last.neg.test.B.int = 301,
   last.neg.test.W.int = 315, mean.test.B.int = 301, mean.test.W.int = 315,
   testing.pattern = "memoryless", test.window.int = 21,
   tt.traj.B.prob = c(0.077, 0, 0.356, 0.567), tt.traj.W.prob = c(0.052, 0,
@@ -45,14 +45,15 @@ param_msm(nwstats, race.method = 2, last.neg.test.B.int = 301,
   cond.diag.pers.beta = -0.67, cond.discl.pers.beta = -0.85,
   cond.diag.inst.beta = -0.67, cond.discl.inst.beta = -0.85,
   vv.iev.BB.prob = 0.42, vv.iev.BW.prob = 0.56, vv.iev.WW.prob = 0.49,
-  prep.start = Inf, prep.aware.B = 0.5, prep.aware.W = 0.5,
-  prep.access.B = 0.76, prep.access.W = 0.95, prep.rx.B = 0.63,
-  prep.rx.W = 0.73, prep.adhr.dist.B = reallocate_pcp(reall = 0.598 -
-  0.784), prep.adhr.dist.W = reallocate_pcp(reall = 0.93 - 0.784),
-  prep.class.hr = c(0.69, 0.19, 0.02), prep.discont.rate.B = 1 -
-  (2^(-1/406)), prep.discont.rate.W = 1 - (2^(-1/1155)), prep.tst.int = 90,
-  prep.risk.int = 182, prep.risk.reassess.method = "year",
-  rcomp.prob = 0.41, rcomp.adh.groups = 2:3, rcomp.main.only = FALSE,
+  riskh.start = Inf, prep.start = Inf, prep.replace.mod = "all",
+  prep.class.hr = c(0.69, 0.19, 0.02), prep.coverage = 0,
+  prep.coverage.la = 0, prep.adhr.dist = c(0.089, 0.127, 0.785),
+  prep.adhr.dist.la = c(0.2, 0.8), prep.discont.rate = 1 - (2^(-1/781)),
+  prep.hadr.int = 8 * 7, prep.ladr.int = 12 * 7, prepla.dlevel.icpt = 4.5,
+  prepla.dlevel.icpt.err = 2.5/3, prepla.dlevel.slope = 25,
+  prep.la.hr = c(0.75, 0.5, 0.02), prep.tst.int = 90, prep.risk.int = 182,
+  prep.risk.reassess.method = "year", rcomp.prob = 0.41,
+  rcomp.adh.groups = 2:3, rcomp.main.only = FALSE,
   rcomp.discl.only = FALSE, rgc.tprob = 0.428, ugc.tprob = 0.35,
   rct.tprob = 0.231, uct.tprob = 0.205, rgc.sympt.prob = 0.16,
   ugc.sympt.prob = 0.9, rct.sympt.prob = 0.14, uct.sympt.prob = 0.58,
@@ -371,34 +372,8 @@ two versatile men, they will engage in intra-event versatility
 
 \item{prep.start}{Time step at which the PrEP intervention should start.}
 
-\item{prep.aware.B}{Proportion of black men who are aware of PrEP.}
-
-\item{prep.aware.W}{Proportion of white men who are aware of PrEP.}
-
-\item{prep.access.B}{Proportion of black men aware of PrEP who have access to
-a PrEP provider.}
-
-\item{prep.access.W}{Proportion of white men aware of PrEP who have access to
-a PrEP provider.}
-
-\item{prep.rx.B}{Propotion of black men with access to a PrEP provider and with
-current indications for PrEP who receive a PrEP prescription.}
-
-\item{prep.rx.W}{Proportion of white men with access to a PrEP provide and with
-current indications for PrEP who receive a PrEP prescription.}
-
-\item{prep.adhr.dist.B}{Proportion of black men who are low, medium, and high
-adherent to PrEP.}
-
-\item{prep.adhr.dist.W}{Proportion of white men who are low, medium, and high
-adherent to PrEP.}
-
 \item{prep.class.hr}{The hazard ratio for infection per act associated with each
 level of adherence (from Grant).}
-
-\item{prep.discont.rate.B}{Rate of random discontinuation from PrEP for black men.}
-
-\item{prep.discont.rate.W}{Rate of random discontinuation from PrEP for white men.}
 
 \item{prep.tst.int}{Testing interval for those who are actively on PrEP. This
 overrides the mean testing interval parameters.}
@@ -511,6 +486,16 @@ in the cond.eff parameter.}
 given dual infection with both gonorrhea and chlamydia.}
 
 \item{...}{Additional arguments passed to the function.}
+
+\item{prep.adhr.dist.B}{Proportion of black men who are low, medium, and high
+adherent to PrEP.}
+
+\item{prep.adhr.dist.W}{Proportion of white men who are low, medium, and high
+adherent to PrEP.}
+
+\item{prep.discont.rate.B}{Rate of random discontinuation from PrEP for black men.}
+
+\item{prep.discont.rate.W}{Rate of random discontinuation from PrEP for white men.}
 }
 \value{
 A list object of class \code{param_msm}, which can be passed to

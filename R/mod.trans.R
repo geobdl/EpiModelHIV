@@ -218,9 +218,9 @@ trans_msm <- function(dat, at) {
   rp.op.prep.la.loww <- which(rp.prep.la == 1 & rp.prep.dl >= dl.cuts[1] & rp.prep.dl < dl.cuts[2])
 
   # hr/rr = c(low, med, high)
-  rp.tlo[ip.op.prep.la.high] <- rp.tlo[rp.op.prep.la.high] + log(prep.la.hr[3])
-  rp.tlo[ip.op.prep.la.medm] <- rp.tlo[rp.op.prep.la.medm] + log(prep.la.hr[2])
-  rp.tlo[ip.op.prep.la.loww] <- rp.tlo[rp.op.prep.la.loww] + log(prep.la.hr[1])
+  rp.tlo[rp.op.prep.la.high] <- rp.tlo[rp.op.prep.la.high] + log(prep.la.hr[3])
+  rp.tlo[rp.op.prep.la.medm] <- rp.tlo[rp.op.prep.la.medm] + log(prep.la.hr[2])
+  rp.tlo[rp.op.prep.la.loww] <- rp.tlo[rp.op.prep.la.loww] + log(prep.la.hr[1])
 
   # Acute-stage multipliers
   isAcute <- which(rp.stage %in% 1:2)
