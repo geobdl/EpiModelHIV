@@ -179,7 +179,7 @@ trans_msm <- function(dat, at) {
   rp.prep <- prepStat[disc.rp[, 1]]
   rp.prepcl <- prepClass[disc.rp[, 1]]
   rp.prep.la <- prepStat.la[disc.rp[, 1]]
-  rp.prep.dl <- prepLA.dlevel[disc.ip[, 1]]
+  rp.prep.dl <- prepLA.dlevel[disc.rp[, 1]]
   rp.uGC <- uGC[disc.rp[, 1]]
   rp.uCT <- uCT[disc.rp[, 1]]
 
