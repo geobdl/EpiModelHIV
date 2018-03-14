@@ -212,15 +212,35 @@
 #'        ("flipping") given that they're having AI.
 #'
 #' @param prep.start Time step at which the PrEP intervention should start.
-#' @param prep.adhr.dist.B Proportion of black men who are low, medium, and high
-#'        adherent to PrEP.
-#' @param prep.adhr.dist.W Proportion of white men who are low, medium, and high
+#' @param prep.adhr.dist Proportion of men who are low, medium, and high
 #'        adherent to PrEP.
 #' @param prep.class.hr The hazard ratio for infection per act associated with each
 #'        level of adherence (from Grant).
-#'
-#' @param prep.discont.rate.B Rate of random discontinuation from PrEP for black men.
-#' @param prep.discont.rate.W Rate of random discontinuation from PrEP for white men.
+#' @param prep.discont.rate Rate of random discontinuation from PrEP.
+#' @param riskh.start Time to start the risk history function to calculate PrEP
+#'        indications.
+#' @param prep.la.start Time to start LA PrEP.
+#' @param prep.replace.mod Model to use for starting MSM on PrEP, with options of
+#'        \code{"all"} to start any man not currently on oral PrEP, \code{"curr.oral"}
+#'        to start any current oral PrEP users, or \code{"curr.oral.ladhr"} for
+#'        low-adherence current oral PrEP users.
+#' @param prep.coverage Overall proportion of PrEP-eligible men currently on
+#'        PrEP.
+#' @param prep.coverage.la Overall proportion of PrEP-eligible men currently on
+#'        LA PrEP.
+#' @param prep.adhr.dist.la Proportion of men who are in low adherence and
+#'        high adherence categories, as a vector of two proportions.
+#' @param prep.hadr.int Weeks between LA PrEP injections for high-adherence LA
+#'        PrEP users.
+#' @param prep.ladr.int Weeks between LA PrEP injections for low-adherence LA
+#'        PrEP users.
+#' @param prepla.dlevel.icpt Mean intercept for LA PrEP drug levels for those
+#'        just starting LA PrEP.
+#' @param prepla.dlevel.icpt.err Standard deviation around intercept for LA PrEP
+#'        drug levels.
+#' @param prepla.dlevel.slope Slope for reduction in drug levels per week.
+#' @param prep.la.hr Hazard ratios associated with three thresholds of LA PrEP
+#'        drug levels.
 #'
 #' @param prep.tst.int Testing interval for those who are actively on PrEP. This
 #'        overrides the mean testing interval parameters.

@@ -45,13 +45,14 @@ param_msm(nwstats, race.method = 1, last.neg.test.B.int = 301,
   cond.diag.pers.beta = -0.67, cond.discl.pers.beta = -0.85,
   cond.diag.inst.beta = -0.67, cond.discl.inst.beta = -0.85,
   vv.iev.BB.prob = 0.42, vv.iev.BW.prob = 0.56, vv.iev.WW.prob = 0.49,
-  riskh.start = Inf, prep.start = Inf, prep.replace.mod = "all",
-  prep.class.hr = c(0.69, 0.19, 0.02), prep.coverage = 0,
-  prep.coverage.la = 0, prep.adhr.dist = c(0.089, 0.127, 0.785),
-  prep.adhr.dist.la = c(0.2, 0.8), prep.discont.rate = 1 - (2^(-1/781)),
-  prep.hadr.int = 8 * 7, prep.ladr.int = 12 * 7, prepla.dlevel.icpt = 4.5,
-  prepla.dlevel.icpt.err = 2.5/3, prepla.dlevel.slope = 25,
-  prep.la.hr = c(0.75, 0.5, 0.02), prep.tst.int = 90, prep.risk.int = 182,
+  riskh.start = Inf, prep.start = Inf, prep.la.start = Inf,
+  prep.replace.mod = "all", prep.class.hr = c(0.69, 0.19, 0.02),
+  prep.coverage = 0, prep.coverage.la = 0, prep.adhr.dist = c(0.089,
+  0.127, 0.785), prep.adhr.dist.la = c(0.2, 0.8), prep.discont.rate = 1 -
+  (2^(-1/781)), prep.hadr.int = 8 * 7, prep.ladr.int = 12 * 7,
+  prepla.dlevel.icpt = 4.5, prepla.dlevel.icpt.err = 2.5/3,
+  prepla.dlevel.slope = 25, prep.la.hr = c(0.75, 0.5, 0.02),
+  prep.tst.int = 90, prep.risk.int = 182,
   prep.risk.reassess.method = "year", rcomp.prob = 0.41,
   rcomp.adh.groups = 2:3, rcomp.main.only = FALSE,
   rcomp.discl.only = FALSE, rgc.tprob = 0.428, ugc.tprob = 0.35,
@@ -370,10 +371,51 @@ two versatile men, they will engage in intra-event versatility
 two versatile men, they will engage in intra-event versatility
 ("flipping") given that they're having AI.}
 
+\item{riskh.start}{Time to start the risk history function to calculate PrEP
+indications.}
+
 \item{prep.start}{Time step at which the PrEP intervention should start.}
+
+\item{prep.la.start}{Time to start LA PrEP.}
+
+\item{prep.replace.mod}{Model to use for starting MSM on PrEP, with options of
+\code{"all"} to start any man not currently on oral PrEP, \code{"curr.oral"}
+to start any current oral PrEP users, or \code{"curr.oral.ladhr"} for
+low-adherence current oral PrEP users.}
 
 \item{prep.class.hr}{The hazard ratio for infection per act associated with each
 level of adherence (from Grant).}
+
+\item{prep.coverage}{Overall proportion of PrEP-eligible men currently on
+PrEP.}
+
+\item{prep.coverage.la}{Overall proportion of PrEP-eligible men currently on
+LA PrEP.}
+
+\item{prep.adhr.dist}{Proportion of men who are low, medium, and high
+adherent to PrEP.}
+
+\item{prep.adhr.dist.la}{Proportion of men who are in low adherence and
+high adherence categories, as a vector of two proportions.}
+
+\item{prep.discont.rate}{Rate of random discontinuation from PrEP.}
+
+\item{prep.hadr.int}{Weeks between LA PrEP injections for high-adherence LA
+PrEP users.}
+
+\item{prep.ladr.int}{Weeks between LA PrEP injections for low-adherence LA
+PrEP users.}
+
+\item{prepla.dlevel.icpt}{Mean intercept for LA PrEP drug levels for those
+just starting LA PrEP.}
+
+\item{prepla.dlevel.icpt.err}{Standard deviation around intercept for LA PrEP
+drug levels.}
+
+\item{prepla.dlevel.slope}{Slope for reduction in drug levels per week.}
+
+\item{prep.la.hr}{Hazard ratios associated with three thresholds of LA PrEP
+drug levels.}
 
 \item{prep.tst.int}{Testing interval for those who are actively on PrEP. This
 overrides the mean testing interval parameters.}
@@ -486,16 +528,6 @@ in the cond.eff parameter.}
 given dual infection with both gonorrhea and chlamydia.}
 
 \item{...}{Additional arguments passed to the function.}
-
-\item{prep.adhr.dist.B}{Proportion of black men who are low, medium, and high
-adherent to PrEP.}
-
-\item{prep.adhr.dist.W}{Proportion of white men who are low, medium, and high
-adherent to PrEP.}
-
-\item{prep.discont.rate.B}{Rate of random discontinuation from PrEP for black men.}
-
-\item{prep.discont.rate.W}{Rate of random discontinuation from PrEP for white men.}
 }
 \value{
 A list object of class \code{param_msm}, which can be passed to
