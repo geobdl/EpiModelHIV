@@ -419,6 +419,7 @@ param_msm <- function(nwstats,
 
                       riskh.start = Inf,
                       prep.start = Inf,
+                      prep.la.start = Inf,
                       prep.replace.mod = "all",
                       prep.class.hr = c(0.69, 0.19, 0.02),
                       prep.coverage = 0,
