@@ -24,48 +24,57 @@ prep_msm <- function(dat, at) {
     return(dat)
   }
 
-  # Set attributes ----------------------------------------------------------
 
-  # Attributes
+  # Attributes --------------------------------------------------------------
+
+  # Core Attributes
   active <- dat$attr$active
   status <- dat$attr$status
   diag.status <- dat$attr$diag.status
   lnt <- dat$attr$last.neg.test
 
+  # Oral PrEP Attributes
   prepElig <- dat$attr$prepElig
-  prepElig.la <- dat$attr$prepElig.la
-
   prepStat <- dat$attr$prepStat
-  prepStat.la <- dat$attr$prepStat.la
-
   prepClass <- dat$attr$prepClass
-  prepClass.la <- dat$attr$prepClass.la
 
+  # LA PrEP Attributes
+  prepElig.la <- dat$attr$prepElig.la
+  prepStat.la <- dat$attr$prepStat.la
+  prepClass.la <- dat$attr$prepClass.la
+  prepTimeLastInj <- dat$attr$prepTimeLastInj
+  prepLA.dlevel <- dat$attr$prepLA.dlevel
+  prepLA.dlevel.int <- dat$attr$prepLA.dlevel.int
+
+  # Shared PrEP Attributes
   prepLastRisk <- dat$attr$prepLastRisk
   prepStartTime <- dat$attr$prepStartTime
   prepLastStiScreen <- dat$attr$prepLastStiScreen
 
-  prepTimeLastInj <- dat$attr$prepTimeLastInj
 
-  # Parameters
-  prep.replace.mod <- dat$param$prep.replace.mod
+  # Parameters --------------------------------------------------------------
 
+  # Oral PrEP parameters
   prep.coverage <- dat$param$prep.coverage
-  prep.coverage.la <- dat$param$prep.coverage.la
-
-  prep.risk.reassess.method <- dat$param$prep.risk.reassess.method
-
   prep.adhr.dist <- dat$param$prep.adhr.dist
+
+  # LA PrEP parameters
+  prep.coverage.la <- dat$param$prep.coverage.la
+  prep.replace.mod <- dat$param$prep.replace.mod
   prep.adhr.dist.la <- dat$param$prep.adhr.dist.la
-
-  prep.discont.rate <- dat$param$prep.discont.rate
-
   prep.hadr.int <- dat$param$prep.hadr.int
   prep.ladr.int <- dat$param$prep.ladr.int
+  icept <- dat$param$prepla.dlevel.icpt
+  icept.err <- dat$param$prepla.dlevel.icpt.err
+  slope <- dat$param$prepla.dlevel.slope
 
-  ## Eligibility ---------------------------------------------------------------
+  # Shared PrEP parameters
+  prep.risk.reassess.method <- dat$param$prep.risk.reassess.method
+  prep.discont.rate <- dat$param$prep.discont.rate
 
-  # Core indications
+
+  # Indications -------------------------------------------------------------
+
   ind1 <- dat$attr$prep.ind.uai.mono
   ind2 <- dat$attr$prep.ind.uai.nmain
   ind3 <- dat$attr$prep.ind.ai.sd
@@ -73,19 +82,27 @@ prep_msm <- function(dat, at) {
 
   twind <- at - dat$param$prep.risk.int
 
-
-  ## Stoppage ------------------------------------------------------------------
-
-  # No indications
+  # No indications in window
   idsNoIndic <- which((ind1 < twind | is.na(ind1)) &
-                      (ind2 < twind | is.na(ind2)) &
-                      (ind3 < twind | is.na(ind3)) &
-                      (ind4 < twind | is.na(ind4)))
+                        (ind2 < twind | is.na(ind2)) &
+                        (ind3 < twind | is.na(ind3)) &
+                        (ind4 < twind | is.na(ind4)))
 
+  # Indications in window
+  idsIndic <- which(ind1 >= twind |
+                      ind2 >= twind |
+                      ind3 >= twind |
+                      ind4 >= twind)
+
+  # Set eligibility to 0 if no indications
   prepElig[idsNoIndic] <- 0
   prepElig.la[idsNoIndic] <- 0
 
-  # Risk reassessment rule
+
+  ## Stoppage ------------------------------------------------------------------
+
+  # Indication lapse
+  # Rules = None, instant, yearly (CDC guidelines)
   if (prep.risk.reassess.method == "none") {
     idsStpInd <- NULL
   } else if (prep.risk.reassess.method == "inst") {
@@ -115,12 +132,11 @@ prep_msm <- function(dat, at) {
   idsStp.oral <- intersect(idsStp, which(prepStat == 1))
   idsStp.la <- intersect(idsStp, which(prepStat.la == 1))
 
+  # Update attributes for stoppers
   prepStat[idsStp.oral] <- 0
   prepElig[idsStp.oral] <- 0
-
   prepStat.la[idsStp.la] <- 0
   prepElig.la[idsStp.la] <- 0
-
   prepLastRisk[idsStp] <- NA
   prepStartTime[idsStp] <- NA
   prepLastStiScreen[idsStp] <- NA
@@ -136,25 +152,25 @@ prep_msm <- function(dat, at) {
                         prepStat == 0 &
                         prepStat.la == 0 &
                         lnt == at)
-
-  idsIndic <- which(ind1 >= twind | ind2 >= twind | ind3 >= twind | ind4 >= twind)
-
   idsEligStart <- intersect(idsIndic, idsEligStart)
-
   prepElig[idsEligStart] <- 1
 
+  # Current PrEP coverage level
   prepCov <- sum(prepStat == 1, na.rm = TRUE)/sum(prepElig == 1, na.rm = TRUE)
   prepCov <- ifelse(is.nan(prepCov), 0, prepCov)
 
+  # n starting = gap between expected and current coverage
   nEligSt <- length(idsEligStart)
   nStart <- max(0, min(nEligSt, round((prep.coverage - prepCov) *
                                         sum(prepElig == 1, na.rm = TRUE))))
+
+  # Randomly select starters
   idsStart <- NULL
   if (nStart > 0) {
     idsStart <- ssample(idsEligStart, nStart)
   }
 
-  # Attributes
+  # Set attributes for starters
   if (length(idsStart) > 0) {
     prepStat[idsStart] <- 1
     prepStartTime[idsStart] <- at
@@ -169,102 +185,112 @@ prep_msm <- function(dat, at) {
 
   ## Injectable ##
 
+  # LA PrEP initiation method
+  # Rules = all, current oral users, current low-adherence oral users
   if (prep.replace.mod == "all") {
     idsEligStart.la <- which(active == 1 &
                              status == 0 &
                              prepStat == 0 &
                              prepStat.la == 0 &
                              lnt == at)
-  } else if (prep.replace.mod == "curr.oral") { ## TODO: restrict to PrEP start time < at
+  } else if (prep.replace.mod == "curr.oral") {
     idsEligStart.la <- which(active == 1 &
                              status == 0 &
                              prepStat == 1 &
+                             prepStartTime < at &
                              prepStat.la == 0 &
                              lnt == at)
   } else if (prep.replace.mod == "curr.oral.ladhr") {
     idsEligStart.la <- which(active == 1 &
                              status == 0 &
                              prepStat == 1 &
+                             prepStartTime < at &
                              prepStat.la == 0 &
                              prepClass == 1 &
                              lnt == at)
   }
 
+  # No LA starts if LA PrEP not yet started
+  if (dat$param$prep.la.start > at) {
+    idsEligStart.la <- NULL
+  }
+
+  # Eligible if indicated and LA eligible
   idsEligStart.la <- intersect(idsIndic, idsEligStart.la)
   prepElig.la[idsEligStart.la] <- 1
 
+  # Current LA PrEP coverage level
   prepCov.la <- sum(prepStat.la == 1, na.rm = TRUE)/sum(prepElig.la == 1, na.rm = TRUE)
   prepCov.la <- ifelse(is.nan(prepCov.la), 0, prepCov.la)
 
+  # n starting = gap between expected and current coverage
   nEligSt.la <- length(idsEligStart.la)
   nStart.la <- max(0, min(nEligSt.la, round((prep.coverage.la - prepCov.la) *
                                         sum(prepElig.la == 1, na.rm = TRUE))))
+
+  # Randomly select LA starters
   idsStart.la <- NULL
   if (nStart.la > 0) {
     idsStart.la <- ssample(idsEligStart.la, nStart.la)
   }
 
-  # Attributes
+  # Set attributes for LA starters
   if (length(idsStart.la) > 0) {
     prepStat.la[idsStart.la] <- 1
     prepStartTime[idsStart.la] <- at
     prepLastRisk[idsStart.la] <- at
 
-    # PrEP adherence class
+    # LA PrEP adherence class
     needPC <- which(is.na(prepClass.la[idsStart.la]))
     prepClass.la[idsStart.la[needPC]] <- sample(x = 1:2, size = length(needPC),
                                           replace = TRUE, prob = prep.adhr.dist.la)
   }
 
 
-  # Injection Process -------------------------------------------------------
+  # LA PrEP Interval Injection ----------------------------------------------
 
-  # Started Today
+  # Current PrEP Starters
   start.today <- which(prepStat.la == 1 & prepStartTime == at)
   prepTimeLastInj[start.today] <- at
 
+  # Weeks since last injection
   last.inj <- at - prepTimeLastInj
 
-  # High Adherence
+  # High Adherence needing injection
   idsLA.hadr <- which(prepStat.la == 1 & prepClass.la == 2)
   get.injection.hadr <- intersect(idsLA.hadr, which(last.inj >= prep.hadr.int))
 
-  # Low Adherence
+  # Low Adherence needing injection
   idsLA.ladr <- which(prepStat.la == 1 & prepClass.la == 1)
   get.injection.ladr <- intersect(idsLA.ladr, which(last.inj >= prep.ladr.int))
 
+  # All needing injection
   get.injection <- union(get.injection.hadr, get.injection.ladr)
 
+  # Update injection time attributes
   prepTimeLastInj[get.injection] <- at
-
   last.inj <- at - prepTimeLastInj
 
 
-  # Drug Level --------------------------------------------------------------
+  # LA PrEP Drug Levels -----------------------------------------------------
 
-  # attributes
-  prepLA.dlevel <- dat$attr$prepLA.dlevel
-  prepLA.dlevel.int <- dat$attr$prepLA.dlevel.int
+  # Set drug level intercept for those newly started
+  prepLA.dlevel.int[start.today] <- pmax(0.1,
+                                         rnorm(length(start.today),
+                                               icept, icept.err))
 
-  # parameters
-  icept <- dat$param$prepla.dlevel.icpt # 4.5
-  icept.err <- dat$param$prepla.dlevel.icpt.err # 2.5/3
-  slope <- dat$param$prepla.dlevel.slope # 25
-
-  # set dlevel.int for newly injected
-  prepLA.dlevel.int[start.today] <- pmax(0.1, rnorm(length(start.today), icept, icept.err))
-
-  # update dlevel for all active users
+  # Update dlevel for all active users
   prepLA.dlevel <- prepLA.dlevel.int * 10^(-(1/slope)*last.inj)
 
 
   ## Output --------------------------------------------------------------------
 
   # Attributes
-
+  dat$attr$prepElig <- prepElig
   dat$attr$prepStat <- prepStat
   dat$attr$prepClass <- prepClass
 
+  dat$attr$prepElig.la <- prepElig.la
   dat$attr$prepStat.la <- prepStat.la
   dat$attr$prepClass.la <- prepClass.la
 
@@ -275,7 +301,6 @@ prep_msm <- function(dat, at) {
   dat$attr$prepTimeLastInj <- prepTimeLastInj
   dat$attr$prepLA.dlevel <- prepLA.dlevel
   dat$attr$prepLA.dlevel.int <- prepLA.dlevel.int
-
 
   return(dat)
 }
