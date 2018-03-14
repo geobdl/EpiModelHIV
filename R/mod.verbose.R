@@ -24,38 +24,15 @@
 #'
 verbose_msm <- function(x, type, s, at) {
 
-  if (type == "startup") {
-
-  }
+  if (type == "startup") {  }
 
   if (type == "progress") {
     if (x$control$verbose == TRUE) {
-      if (!interactive()) {
-        if (!is.null(x$control$ncores) && x$control$ncores > 1) {
-          if (x$control$verbose.int > 0 && (at %% x$control$verbose.int == 0)) {
-            simno <- x$control$simno
-            currsim <- x$control$currsim
-            if (file.exists("verb/") == FALSE) {
-              dir.create("verb/")
-            }
-            fn <- paste0("verb/sim", simno, ".s", currsim, ".txt")
-            cat("SIMNO ", paste(simno, currsim, sep = "."),
-                "\n====================",
-                "\nStep: ", at, " (", round(at/x$control$nsteps, 2), ")",
-                "\nPop Size: ", x$epi$num[at],
-                "\nTot Prev: ", round(x$epi$i.num[at] / x$epi$num[at], 3),
-                "\n\n", sep = "", file = fn)
-          }
-        }
-      } else {
-        verbose.int <- x$control$verbose.int
+      verbose.int <- x$control$verbose.int
         if (verbose.int > 0 && (at %% verbose.int == 0)) {
-
           nsteps <- x$control$nsteps
           time.unit <- x$param$time.unit
           prev <- round(x$epi$i.prev[at], 3)
-          prev.B <- round(x$epi$i.prev.B[at], 3)
-          prev.W <- round(x$epi$i.prev.W[at], 3)
           prev.gc <- round(x$epi$prev.gc[at], 3)
           prev.ct <- round(x$epi$prev.ct[at], 3)
 
@@ -73,18 +50,12 @@ verbose_msm <- function(x, type, s, at) {
           cat("\nHIV Cuml Incidence:", sum(x$epi$incid, na.rm = TRUE))
           cat("\n------------------------------")
           cat("\nHIV Prevalence: ", x$epi$i.num[at], " (", prev, ")", sep = "")
-          cat("\n B HIV Prevalence: ", x$epi$i.num.B[at], " (", prev.B, ")", sep = "")
-          cat("\n W HIV Prevalence: ", x$epi$i.num.W[at], " (", prev.W, ")", sep = "")
           cat("\n------------------------------")
           cat("\nGC Prevalence: ", prev.gc, sep = "")
           cat("\nCT Prevalence: ", prev.ct, sep = "")
           cat("\n==============================")
-
-        }
       }
     }
-
-
   }
 }
 
