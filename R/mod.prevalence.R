@@ -29,8 +29,8 @@ prevalence_msm <- function(dat, at) {
   # Attributes
 
   active <- dat$attr$active
-  race <- dat$attr$race
   status <- dat$attr$status
+  race <- dat$attr$race
 
   prepStat <- dat$attr$prepStat
   prepElig <- dat$attr$prepElig
@@ -45,20 +45,12 @@ prevalence_msm <- function(dat, at) {
   dat$epi$num.W[at] <- sum(race == "W", na.rm = TRUE)
 
   dat$epi$s.num[at] <- sum(status == 0, na.rm = TRUE)
-  dat$epi$s.num.B[at] <- sum(status == 0 & race == "B", na.rm = TRUE)
-  dat$epi$s.num.W[at] <- sum(status == 0 & race == "W", na.rm = TRUE)
 
   dat$epi$i.num[at] <- sum(status == 1, na.rm = TRUE)
-  dat$epi$i.num.B[at] <- sum(status == 1 & race == "B", na.rm = TRUE)
-  dat$epi$i.num.W[at] <- sum(status == 1 & race == "W", na.rm = TRUE)
 
   dat$epi$i.prev[at] <- dat$epi$i.num[at] / dat$epi$num[at]
-  dat$epi$i.prev.B[at] <- dat$epi$i.num.B[at] / dat$epi$num.B[at]
-  dat$epi$i.prev.W[at] <- dat$epi$i.num.W[at] / dat$epi$num.W[at]
 
   dat$epi$ir100[at] <- (dat$epi$incid[at] / sum(status == 0, na.rm = TRUE)) * 5200
-  dat$epi$ir100.B[at] <- (dat$epi$incid.B[at] / sum(status == 0 & race == "B", na.rm = TRUE)) * 5200
-  dat$epi$ir100.W[at] <- (dat$epi$incid.W[at] / sum(status == 0 & race == "W", na.rm = TRUE)) * 5200
 
   dat$epi$prepCurr[at] <- sum(prepStat == 1, na.rm = TRUE)
   dat$epi$prepElig[at] <- sum(prepElig == 1, na.rm = TRUE)
@@ -68,23 +60,9 @@ prevalence_msm <- function(dat, at) {
   dat$epi$ir100.gc[at] <- (dat$epi$incid.gc[at] /
                              (sum(rGC == 0, na.rm = TRUE) +
                                 sum(uGC == 0, na.rm = TRUE))) * 5200
-  dat$epi$ir100.gc.B[at] <- (dat$epi$incid.gc.B[at] /
-                               (sum(rGC == 0 & race == "B", na.rm = TRUE) +
-                                  sum(uGC == 0 & race == "B", na.rm = TRUE))) * 5200
-  dat$epi$ir100.gc.W[at] <- (dat$epi$incid.gc.W[at] /
-                               (sum(rGC == 0 & race == "W", na.rm = TRUE) +
-                                  sum(uGC == 0 & race == "W", na.rm = TRUE))) * 5200
   dat$epi$ir100.ct[at] <- (dat$epi$incid.ct[at] /
                              (sum(rCT == 0, na.rm = TRUE) +
                                 sum(uCT == 0, na.rm = TRUE))) * 5200
-
-  dat$epi$ir100.ct.B[at] <- (dat$epi$incid.ct.B[at] /
-                             (sum(rCT == 0 & race == "B", na.rm = TRUE) +
-                                sum(uCT == 0 & race == "B", na.rm = TRUE))) * 5200
-  dat$epi$ir100.ct.W[at] <- (dat$epi$incid.ct.W[at] /
-                               (sum(rCT == 0 & race == "W", na.rm = TRUE) +
-                                  sum(uCT == 0 & race == "W", na.rm = TRUE))) * 5200
-
 
   return(dat)
 }

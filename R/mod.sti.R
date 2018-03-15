@@ -283,12 +283,7 @@ sti_trans <- function(dat, at) {
 
   # Summary stats
   dat$epi$incid.gc[at] <- length(idsInf_rgc) + length(idsInf_ugc)
-  dat$epi$incid.gc.B[at] <- length(intersect(union(idsInf_rgc, idsInf_ugc), which(race == "B")))
-  dat$epi$incid.gc.W[at] <- length(intersect(union(idsInf_rgc, idsInf_ugc), which(race == "W")))
-
   dat$epi$incid.ct[at] <- length(idsInf_rct) + length(idsInf_uct)
-  dat$epi$incid.ct.B[at] <- length(intersect(union(idsInf_rct, idsInf_uct), which(race == "B")))
-  dat$epi$incid.ct.W[at] <- length(intersect(union(idsInf_rct, idsInf_uct), which(race == "W")))
 
 
   # Check all infected have all STI attributes
