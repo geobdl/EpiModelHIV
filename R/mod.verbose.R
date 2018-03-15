@@ -35,6 +35,8 @@ verbose_msm <- function(x, type, s, at) {
           prev <- round(x$epi$i.prev[at], 3)
           prev.gc <- round(x$epi$prev.gc[at], 3)
           prev.ct <- round(x$epi$prev.ct[at], 3)
+          incid.gc <- round(mean(tail(x$epi$ir100.gc, 100), na.rm = TRUE), 3)
+          incid.ct <- round(mean(tail(x$epi$ir100.ct, 100), na.rm = TRUE), 3)
 
           cat("\014")
           cat("\nEpidemic Simulation")
@@ -52,7 +54,9 @@ verbose_msm <- function(x, type, s, at) {
           cat("\nHIV Prevalence: ", x$epi$i.num[at], " (", prev, ")", sep = "")
           cat("\n------------------------------")
           cat("\nGC Prevalence: ", prev.gc, sep = "")
+          cat("\nGC Incidence: ", incid.gc, sep = "")
           cat("\nCT Prevalence: ", prev.ct, sep = "")
+          cat("\nCT Incidence: ", incid.ct, sep = "")
           cat("\n==============================")
       }
     }
