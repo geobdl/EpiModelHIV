@@ -301,6 +301,7 @@
 #'        for White men.
 #'
 #' @param prep.sti.screen.int Interval in days between STI screening at PrEP visits.
+#' @param prep.la.sti.screen.int Interval in days between STI screening at LA PrEP visits.
 #' @param prep.sti.prob.tx Probability of treatment given positive screening during
 #'        PrEP visit.
 #' @param prep.continue.stand.tx Logical, if \code{TRUE} will continue standard

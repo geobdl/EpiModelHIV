@@ -63,11 +63,11 @@ param_msm(nwstats, race.method = 1, last.neg.test.B.int = 301,
   ct.sympt.prob.tx.B = 0.85, ct.sympt.prob.tx.W = 0.85,
   gc.asympt.prob.tx.B = 0.15, gc.asympt.prob.tx.W = 0.15,
   ct.asympt.prob.tx.B = 0.15, ct.asympt.prob.tx.W = 0.15,
-  prep.sti.screen.int = 182, prep.sti.prob.tx = 1,
-  prep.continue.stand.tx = TRUE, sti.cond.eff = 0.95,
-  sti.cond.fail.B = 0.39, sti.cond.fail.W = 0.21, hiv.rgc.rr = 2.78,
-  hiv.ugc.rr = 1.73, hiv.rct.rr = 2.78, hiv.uct.rr = 1.73,
-  hiv.dual.rr = 0.2, ...)
+  prep.sti.screen.int = 182, prep.la.sti.screen.int = 182,
+  prep.sti.prob.tx = 1, prep.continue.stand.tx = TRUE,
+  sti.cond.eff = 0.95, sti.cond.fail.B = 0.39, sti.cond.fail.W = 0.21,
+  hiv.rgc.rr = 2.78, hiv.ugc.rr = 1.73, hiv.rct.rr = 2.78,
+  hiv.uct.rr = 1.73, hiv.dual.rr = 0.2, ...)
 }
 \arguments{
 \item{nwstats}{Target statistics for the network model. An object of class
@@ -499,6 +499,8 @@ for Black men.}
 for White men.}
 
 \item{prep.sti.screen.int}{Interval in days between STI screening at PrEP visits.}
+
+\item{prep.la.sti.screen.int}{Interval in days between STI screening at LA PrEP visits.}
 
 \item{prep.sti.prob.tx}{Probability of treatment given positive screening during
 PrEP visit.}
