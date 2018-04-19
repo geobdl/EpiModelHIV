@@ -28,6 +28,8 @@ condoms_msm <- function(dat, at) {
   race <- dat$attr$race
   prepStat <- dat$attr$prepStat
   prepClass <- dat$attr$prepClass
+  prepStat.la <- dat$attr$prepStat.la
+  prepClass.la <- dat$attr$prepClass.la
 
   # Parameters
   rcomp.prob <- dat$param$rcomp.prob
@@ -138,6 +140,8 @@ condoms_msm <- function(dat, at) {
 
       idsRC <- which((prepStat[elt[, 1]] == 1 & prepClass[elt[, 1]] %in% rcomp.adh.groups) |
                      (prepStat[elt[, 2]] == 1 & prepClass[elt[, 2]] %in% rcomp.adh.groups))
+      idsRC.la <- which((prepStat.la[elt[, 1]] == 1 & prepClass.la[elt[, 1]] == 2) |
+                        (prepStat.la[elt[, 2]] == 1 & prepClass.la[elt[, 2]] == 2))
 
       if (rcomp.main.only == TRUE & ptype > 1) {
         idsRC <- NULL
