@@ -446,14 +446,10 @@ sti_tx <- function(dat, at) {
   ct.asympt.prob.tx.B <- dat$param$ct.asympt.prob.tx.W
 
   prep.sti.screen.int <- dat$param$prep.sti.screen.int
+  prep.la.sti.screen.int <- dat$param$prep.la.sti.screen.int
   prep.sti.prob.tx <- dat$param$prep.sti.prob.tx
 
-  prep.cont.stand.tx <- dat$param$prep.continue.stand.tx
-  if (prep.cont.stand.tx == TRUE) {
-    prep.stand.tx.grp <- 0:1
-  } else {
-    prep.stand.tx.grp <- 0
-  }
+  prep.stand.tx.grp <- 0:1
 
   race <- dat$attr$race
 
@@ -611,7 +607,8 @@ sti_tx <- function(dat, at) {
 
   ## Interval-based treatment for MSM on PrEP ##
   idsSTI_screen <- which(dat$attr$prepStartTime == at |
-                           (at - dat$attr$prepLastStiScreen >= prep.sti.screen.int))
+                         (dat$attr$prepStatus == 1 & at - dat$attr$prepLastStiScreen >= prep.sti.screen.int) |
+                         (dat$attr$prepStatus.la == 1 & at - dat$attr$prepLastStiScreen >= prep.la.sti.screen.int))
 
   dat$attr$prepLastStiScreen[idsSTI_screen] <- at
 
