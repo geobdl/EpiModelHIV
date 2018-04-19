@@ -304,8 +304,6 @@
 #' @param prep.la.sti.screen.int Interval in days between STI screening at LA PrEP visits.
 #' @param prep.sti.prob.tx Probability of treatment given positive screening during
 #'        PrEP visit.
-#' @param prep.continue.stand.tx Logical, if \code{TRUE} will continue standard
-#'        STI treatment of symptomatic cases even after PrEP initiation.
 #' @param sti.cond.eff Relative risk of STI infection from anal sex when a condom is
 #'        used properly (biological efficacy).
 #' @param sti.cond.fail.B Condom failure rates for STI for Black MSM, as a reduction
@@ -408,9 +406,9 @@ param_msm <- function(nwstats,
                       base.ai.pers.BB.rate = 0.14,
                       base.ai.pers.BW.rate = 0.14,
                       base.ai.pers.WW.rate = 0.14,
-                      ai.scale.BB = 1.15,
-                      ai.scale.BW = 1.15,
-                      ai.scale.WW = 1.15,
+                      ai.scale.BB = 1.0748572,
+                      ai.scale.BW = 1.0748572,
+                      ai.scale.WW = 1.0748572,
 
                       cond.main.BB.prob = 0.21,
                       cond.main.BW.prob = 0.21,
@@ -463,46 +461,45 @@ param_msm <- function(nwstats,
                       rcomp.main.only = FALSE,
                       rcomp.discl.only = FALSE,
 
-                      rgc.tprob = 0.357698,
-                      ugc.tprob = 0.248095,
-                      rct.tprob = 0.321597,
-                      uct.tprob = 0.212965,
+                      rgc.tprob = 0.3972,
+                      ugc.tprob = 0.3060,
+                      rct.tprob = 0.2220,
+                      uct.tprob = 0.1819,
 
                       rgc.sympt.prob = 0.16,
                       ugc.sympt.prob = 0.90,
-                      rct.sympt.prob = 0.14,
+                      rct.sympt.prob = 0.16,
                       uct.sympt.prob = 0.58,
 
-                      rgc.ntx.int = 35.11851*7,
-                      ugc.ntx.int = 35.11851*7,
+                      rgc.ntx.int = 234.14,
+                      ugc.ntx.int = 234.14,
                       gc.tx.int = 7,
 
-                      rct.ntx.int = 44.24538*7,
-                      uct.ntx.int = 44.24538*7,
+                      rct.ntx.int = 318.59,
+                      uct.ntx.int = 318.59,
                       ct.tx.int = 7,
 
-                      gc.sympt.prob.tx.B = 0.90,
-                      gc.sympt.prob.tx.W = 0.90,
-                      ct.sympt.prob.tx.B = 0.85,
-                      ct.sympt.prob.tx.W = 0.85,
-                      gc.asympt.prob.tx.B = 0.15,
-                      gc.asympt.prob.tx.W = 0.15,
+                      gc.sympt.prob.tx.B = 0.85,
+                      gc.sympt.prob.tx.W = 0.85,
+                      ct.sympt.prob.tx.B = 0.90,
+                      ct.sympt.prob.tx.W = 0.90,
+                      gc.asympt.prob.tx.B = 0.10,
+                      gc.asympt.prob.tx.W = 0.10,
                       ct.asympt.prob.tx.B = 0.15,
                       ct.asympt.prob.tx.W = 0.15,
 
                       prep.sti.screen.int = 182,
-                      prep.la.sti.screen.int = 182,
+                      prep.la.sti.screen.int = 121,
                       prep.sti.prob.tx = 1,
-                      prep.continue.stand.tx = TRUE,
 
                       sti.cond.eff = 0.95,
                       sti.cond.fail.B = 0.39,
                       sti.cond.fail.W = 0.21,
 
-                      hiv.rgc.rr = 2.78,
-                      hiv.ugc.rr = 1.73,
-                      hiv.rct.rr = 2.78,
-                      hiv.uct.rr = 1.73,
+                      hiv.rgc.rr = 2.7426694,
+                      hiv.ugc.rr = 1.6936982,
+                      hiv.rct.rr = 2.7426694,
+                      hiv.uct.rr = 1.6936982,
                       hiv.dual.rr = 0.2,
                       ...) {
 

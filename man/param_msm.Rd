@@ -33,14 +33,15 @@ param_msm(nwstats, race.method = 1, last.neg.test.B.int = 301,
   base.ai.main.BB.rate = 0.22, base.ai.main.BW.rate = 0.22,
   base.ai.main.WW.rate = 0.22, base.ai.pers.BB.rate = 0.14,
   base.ai.pers.BW.rate = 0.14, base.ai.pers.WW.rate = 0.14,
-  ai.scale.BB = 1.15, ai.scale.BW = 1.15, ai.scale.WW = 1.15,
-  cond.main.BB.prob = 0.21, cond.main.BW.prob = 0.21,
-  cond.main.WW.prob = 0.21, cond.pers.always.prob = 0.216,
-  cond.pers.BB.prob = 0.26, cond.pers.BW.prob = 0.26,
-  cond.pers.WW.prob = 0.26, cond.inst.always.prob = 0.326,
-  cond.inst.BB.prob = 0.27, cond.inst.BW.prob = 0.27,
-  cond.inst.WW.prob = 0.27, cond.always.prob.corr = 0.5, cond.rr.BB = 1,
-  cond.rr.BW = 1, cond.rr.WW = 1, cond.diag.main.beta = -0.67,
+  ai.scale.BB = 1.0748572, ai.scale.BW = 1.0748572,
+  ai.scale.WW = 1.0748572, cond.main.BB.prob = 0.21,
+  cond.main.BW.prob = 0.21, cond.main.WW.prob = 0.21,
+  cond.pers.always.prob = 0.216, cond.pers.BB.prob = 0.26,
+  cond.pers.BW.prob = 0.26, cond.pers.WW.prob = 0.26,
+  cond.inst.always.prob = 0.326, cond.inst.BB.prob = 0.27,
+  cond.inst.BW.prob = 0.27, cond.inst.WW.prob = 0.27,
+  cond.always.prob.corr = 0.5, cond.rr.BB = 1, cond.rr.BW = 1,
+  cond.rr.WW = 1, cond.diag.main.beta = -0.67,
   cond.discl.main.beta = -0.85, cond.diag.pers.beta = -0.67,
   cond.discl.pers.beta = -0.85, cond.diag.inst.beta = -0.67,
   cond.discl.inst.beta = -0.85, vv.iev.BB.prob = 0.42,
@@ -54,20 +55,19 @@ param_msm(nwstats, race.method = 1, last.neg.test.B.int = 301,
   prep.la.hr = c(0.15, 0.05, 0.02), prep.tst.int = 90,
   prep.risk.int = 182, prep.risk.reassess.method = "year",
   rcomp.prob = 0.41, rcomp.adh.groups = 2:3, rcomp.main.only = FALSE,
-  rcomp.discl.only = FALSE, rgc.tprob = 0.357698, ugc.tprob = 0.248095,
-  rct.tprob = 0.321597, uct.tprob = 0.212965, rgc.sympt.prob = 0.16,
-  ugc.sympt.prob = 0.9, rct.sympt.prob = 0.14, uct.sympt.prob = 0.58,
-  rgc.ntx.int = 35.11851 * 7, ugc.ntx.int = 35.11851 * 7, gc.tx.int = 7,
-  rct.ntx.int = 44.24538 * 7, uct.ntx.int = 44.24538 * 7, ct.tx.int = 7,
-  gc.sympt.prob.tx.B = 0.9, gc.sympt.prob.tx.W = 0.9,
-  ct.sympt.prob.tx.B = 0.85, ct.sympt.prob.tx.W = 0.85,
-  gc.asympt.prob.tx.B = 0.15, gc.asympt.prob.tx.W = 0.15,
+  rcomp.discl.only = FALSE, rgc.tprob = 0.3972, ugc.tprob = 0.306,
+  rct.tprob = 0.222, uct.tprob = 0.1819, rgc.sympt.prob = 0.16,
+  ugc.sympt.prob = 0.9, rct.sympt.prob = 0.16, uct.sympt.prob = 0.58,
+  rgc.ntx.int = 234.14, ugc.ntx.int = 234.14, gc.tx.int = 7,
+  rct.ntx.int = 318.59, uct.ntx.int = 318.59, ct.tx.int = 7,
+  gc.sympt.prob.tx.B = 0.85, gc.sympt.prob.tx.W = 0.85,
+  ct.sympt.prob.tx.B = 0.9, ct.sympt.prob.tx.W = 0.9,
+  gc.asympt.prob.tx.B = 0.1, gc.asympt.prob.tx.W = 0.1,
   ct.asympt.prob.tx.B = 0.15, ct.asympt.prob.tx.W = 0.15,
-  prep.sti.screen.int = 182, prep.la.sti.screen.int = 182,
-  prep.sti.prob.tx = 1, prep.continue.stand.tx = TRUE,
-  sti.cond.eff = 0.95, sti.cond.fail.B = 0.39, sti.cond.fail.W = 0.21,
-  hiv.rgc.rr = 2.78, hiv.ugc.rr = 1.73, hiv.rct.rr = 2.78,
-  hiv.uct.rr = 1.73, hiv.dual.rr = 0.2, ...)
+  prep.sti.screen.int = 182, prep.la.sti.screen.int = 121,
+  prep.sti.prob.tx = 1, sti.cond.eff = 0.95, sti.cond.fail.B = 0.39,
+  sti.cond.fail.W = 0.21, hiv.rgc.rr = 2.7426694, hiv.ugc.rr = 1.6936982,
+  hiv.rct.rr = 2.7426694, hiv.uct.rr = 1.6936982, hiv.dual.rr = 0.2, ...)
 }
 \arguments{
 \item{nwstats}{Target statistics for the network model. An object of class
@@ -504,9 +504,6 @@ for White men.}
 
 \item{prep.sti.prob.tx}{Probability of treatment given positive screening during
 PrEP visit.}
-
-\item{prep.continue.stand.tx}{Logical, if \code{TRUE} will continue standard
-STI treatment of symptomatic cases even after PrEP initiation.}
 
 \item{sti.cond.eff}{Relative risk of STI infection from anal sex when a condom is
 used properly (biological efficacy).}
