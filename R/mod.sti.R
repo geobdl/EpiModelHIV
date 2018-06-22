@@ -253,7 +253,7 @@ sti_trans_msm <- function(dat, at) {
 
     # Late stage multiplier
     islate <- which(dal.stage.syph %in% 5:6)
-    dal.syph.tlo[islate] <- dal.syph.tlo[islate] * syph.late.rr
+    dal.syph.tlo[islate] <- dal.syph.tlo[islate] + log(syph.late.rr)
 
     # Retransformation to probability
     dal.syph.tprob <- plogis(dal.syph.tlo)
@@ -1086,6 +1086,8 @@ sti_tx_msm <- function(dat, at) {
   ept_txUGC_all <- txUGC_all[dat$attr$recentpartners[txUGC_all] > 0]
   ept_txRCT_all <- txRCT_all[dat$attr$recentpartners[txRCT_all] > 0]
   ept_txUCT_all <- txUCT_all[dat$attr$recentpartners[txUCT_all] > 0]
+  ept_txGC_all <- c(ept_txRGC_all, ept_txUGC_all)
+  ept_txCT_all <- c(ept_txRCT_all, ept_txUCT_all)
   ept_tx_all <- unique(c(ept_txRGC_all, ept_txUGC_all, ept_txRCT_all, ept_txUCT_all))
 
   # Update EPT index status and eligibility for GC/CT treated with partners
@@ -1171,6 +1173,9 @@ sti_tx_msm <- function(dat, at) {
   # Update EPT index status for those selected to receive EPT for their partners
   dat$attr$eptindexStat[ept_idsStart] <- 1
 
+  index_gc <- intersect(ept_txGC_all, ept_idsStart)
+  index_ct <- intersect(ept_txCT_all, ept_idsStart)
+
   # Correlated testing for other STIs if symptomatic for one -------------------
 
   # All treated for other site of STIs, minus those getting treated for STI through EPT
@@ -1205,8 +1210,7 @@ sti_tx_msm <- function(dat, at) {
                        role.class[tst.uct] %in% c("I", "V"))]
   tst.syph <- tst.syph[which(tsinceltst.syph[tst.syph] > sti.correlation.time &
                              (is.na(diag.status.syph[tst.syph]) |
-                                diag.status.syph[tst.syph]) &
-                             role.class[tst.syph] %in% c("I", "V"))]
+                                diag.status.syph[tst.syph]))]
 
   tst.rgc.pos <- tst.rgc[which(rGC[tst.rgc] == 1)]
   tst.ugc.pos <- tst.ugc[which(uGC[tst.ugc] == 1)]
@@ -1713,6 +1717,10 @@ sti_tx_msm <- function(dat, at) {
 
 
   # EPT
+  # Number of index provided with EPT
+  dat$epi$eptindexprovided_gc[at] <- length(index_gc)
+  dat$epi$eptindexprovided_ct[at] <- length(index_ct)
+
   # Proportion of treated GC/CT index who have current partners - e.g. eligibility for EPT
   dat$epi$propindexeptElig[at] <- ifelse(length(unique(c(txRGC_all, txUGC_all, txRCT_all, txUCT_all))) > 0,
                                          length(unique(ept_tx_all)) /
