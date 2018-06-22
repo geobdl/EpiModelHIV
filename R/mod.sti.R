@@ -253,7 +253,7 @@ sti_trans_msm <- function(dat, at) {
 
     # Late stage multiplier
     islate <- which(dal.stage.syph %in% 5:6)
-    dal.syph.tlo[islate] <- dal.syph.tlo[islate] * syph.late.rr
+    dal.syph.tlo[islate] <- dal.syph.tlo[islate] + log(syph.late.rr)
 
     # Retransformation to probability
     dal.syph.tprob <- plogis(dal.syph.tlo)
@@ -1209,9 +1209,9 @@ sti_tx_msm <- function(dat, at) {
                                 diag.status.ct[tst.uct]) &
                        role.class[tst.uct] %in% c("I", "V"))]
   tst.syph <- tst.syph[which(tsinceltst.syph[tst.syph] > sti.correlation.time &
-                             (is.na(diag.status.syph[tst.syph]) |
-                                diag.status.syph[tst.syph]) &
-                             role.class[tst.syph] %in% c("I", "V"))]
+                               (is.na(diag.status.syph[tst.syph]) |
+                                  diag.status.syph[tst.syph]))]
+
 
   tst.rgc.pos <- tst.rgc[which(rGC[tst.rgc] == 1)]
   tst.ugc.pos <- tst.ugc[which(uGC[tst.ugc] == 1)]
