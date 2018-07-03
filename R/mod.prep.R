@@ -15,24 +15,24 @@ prep_msm <- function(dat, at) {
   if (at < dat$param$prep.start) {
 
       # Update # of PrEP asymptomatic STI tests to 0
-      dat$epi$rGCasympttests.prep[at] <- 0
-      dat$epi$uGCasympttests.prep[at] <- 0
-      dat$epi$GCasympttests.prep[at] <- 0
-      dat$epi$rGCasympttests.pos.prep[at] <- 0
-      dat$epi$uGCasympttests.pos.prep[at] <- 0
-      dat$epi$GCasympttests.pos.prep[at] <- 0
-
-      dat$epi$rCTasympttests.prep[at] <- 0
-      dat$epi$uCTasympttests.prep[at] <- 0
-      dat$epi$CTasympttests.prep[at] <- 0
-      dat$epi$rCTasympttests.pos.prep[at] <- 0
-      dat$epi$uCTasympttests.pos.prep[at] <- 0
-      dat$epi$CTasympttests.pos.prep[at] <- 0
-
-      dat$epi$syphasympttests.prep[at] <- 0
-      dat$epi$syphasympttests.pos.prep[at] <- 0
-      dat$epi$syphearlyasympttests.pos.prep[at] <- 0
-      dat$epi$syphlateasympttests.pos.prep[at] <- 0
+      # dat$epi$rGCasympttests.prep[at] <- 0
+      # dat$epi$uGCasympttests.prep[at] <- 0
+      # dat$epi$GCasympttests.prep[at] <- 0
+      # dat$epi$rGCasympttests.pos.prep[at] <- 0
+      # dat$epi$uGCasympttests.pos.prep[at] <- 0
+      # dat$epi$GCasympttests.pos.prep[at] <- 0
+      #
+      # dat$epi$rCTasympttests.prep[at] <- 0
+      # dat$epi$uCTasympttests.prep[at] <- 0
+      # dat$epi$CTasympttests.prep[at] <- 0
+      # dat$epi$rCTasympttests.pos.prep[at] <- 0
+      # dat$epi$uCTasympttests.pos.prep[at] <- 0
+      # dat$epi$CTasympttests.pos.prep[at] <- 0
+      #
+      # dat$epi$syphasympttests.prep[at] <- 0
+      # dat$epi$syphasympttests.pos.prep[at] <- 0
+      # dat$epi$syphearlyasympttests.pos.prep[at] <- 0
+      # dat$epi$syphlateasympttests.pos.prep[at] <- 0
 
     return(dat)
   }
@@ -79,13 +79,13 @@ prep_msm <- function(dat, at) {
       dat$attr$stage.time.ar.dx[status == 1] <- 0
       dat$attr$stage.time.af.ndx[status == 1] <- 0
       dat$attr$stage.time.af.dx[status == 1] <- 0
-      dat$epi$stage.time.early.chronic.ndx[status == 1] <- 0
-      dat$epi$stage.time.early.chronic.dx.yrone[status == 1] <- 0
-      dat$epi$stage.time.early.chronic.dx.yrstwotolate[status == 1] <- 0
-      dat$epi$stage.time.early.chronic.art[status == 1] <- 0
-      dat$epi$stage.time.late.chronic.ndx[status == 1] <- 0
-      dat$epi$stage.time.late.chronic.dx[status == 1] <- 0
-      dat$epi$stage.time.late.chronic.art[status == 1] <- 0
+      # dat$epi$stage.time.early.chronic.ndx[status == 1] <- 0
+      # dat$epi$stage.time.early.chronic.dx.yrone[status == 1] <- 0
+      # dat$epi$stage.time.early.chronic.dx.yrstwotolate[status == 1] <- 0
+      # dat$epi$stage.time.early.chronic.art[status == 1] <- 0
+      # dat$epi$stage.time.late.chronic.ndx[status == 1] <- 0
+      # dat$epi$stage.time.late.chronic.dx[status == 1] <- 0
+      # dat$epi$stage.time.late.chronic.art[status == 1] <- 0
       dat$attr$stage.time.aids.ndx[status == 1] <- 0
       dat$attr$stage.time.aids.dx[status == 1] <- 0
       dat$attr$stage.time.aids.art[status == 1] <- 0
@@ -177,13 +177,13 @@ prep_msm <- function(dat, at) {
   ## STI Testing on PrEP ------------------------------------------------------
 
   if (is.null(dat$epi$num.asympt.tx)) {
-      dat$epi$rGCasympttests.prep <- rep(0, length(dat$control$nsteps))
-      dat$epi$uGCasympttests.prep <- rep(0, length(dat$control$nsteps))
-      dat$epi$GCasympttests.prep <- rep(0, length(dat$control$nsteps))
-      dat$epi$rCTasympttests.prep <- rep(0, length(dat$control$nsteps))
-      dat$epi$uCTasympttests.prep <- rep(0, length(dat$control$nsteps))
-      dat$epi$CTasympttests.prep <- rep(0, length(dat$control$nsteps))
-      dat$epi$syphasympttests.prep <- rep(0, length(dat$control$nsteps))
+      # dat$epi$rGCasympttests.prep <- rep(0, length(dat$control$nsteps))
+      # dat$epi$uGCasympttests.prep <- rep(0, length(dat$control$nsteps))
+      # dat$epi$GCasympttests.prep <- rep(0, length(dat$control$nsteps))
+      # dat$epi$rCTasympttests.prep <- rep(0, length(dat$control$nsteps))
+      # dat$epi$uCTasympttests.prep <- rep(0, length(dat$control$nsteps))
+      # dat$epi$CTasympttests.prep <- rep(0, length(dat$control$nsteps))
+      # dat$epi$syphasympttests.prep <- rep(0, length(dat$control$nsteps))
   }
 
     ## Testing
@@ -262,31 +262,31 @@ prep_msm <- function(dat, at) {
   dat$attr$last.diag.time.ct[tst.ct.pos] <- at
 
   # Count number of tests due to PrEP
-  dat$epi$rGCasympttests.prep[at] <- length(tst.rgc)
-  dat$epi$uGCasympttests.prep[at] <- length(tst.ugc)
-  dat$epi$GCasympttests.prep[at] <- length(tst.rgc) + length(tst.ugc)
-
-  dat$epi$rGCasympttests.pos.prep[at] <- length(tst.rgc)
-  dat$epi$uGCasympttests.pos.prep[at] <- length(tst.ugc)
-  dat$epi$GCasympttests.pos.prep[at] <- length(tst.rgc.pos) + length(tst.ugc.pos)
-
-  dat$epi$rCTasympttests.prep[at] <- length(tst.rct)
-  dat$epi$uCTasympttests.prep[at] <- length(tst.uct)
-  dat$epi$CTasympttests.prep[at] <- length(tst.rct) + length(tst.uct)
-
-  dat$epi$rCTasympttests.pos.prep[at] <- length(tst.rct)
-  dat$epi$uCTasympttests.pos.prep[at] <- length(tst.uct)
-  dat$epi$CTasympttests.pos.prep[at] <-
-
-  dat$epi$syphasympttests.prep[at] <- length(tst.syph.prep)
-  dat$epi$syphasympttests.pos.prep[at] <- length(tst.syph.pos)
-  dat$epi$syphearlyasympttests.pos.prep[at] <- length(c(tst.earlysyph.pos))
-  dat$epi$syphlateasympttests.pos.prep[at] <- length(c(tst.latesyph.pos))
-
-  dat$epi$stiasympttests.prep[at] <- length(tst.rgc) + length(tst.ugc) +
-    length(tst.rct) + length(tst.uct) + length(tst.syph.prep)
-  dat$epi$stiasympttests.pos.prep[at] <- length(tst.rgc.pos) + length(tst.ugc.pos) +
-    length(tst.rct.pos) + length(tst.uct.pos) + length(tst.syph.pos)
+  # dat$epi$rGCasympttests.prep[at] <- length(tst.rgc)
+  # dat$epi$uGCasympttests.prep[at] <- length(tst.ugc)
+  # dat$epi$GCasympttests.prep[at] <- length(tst.rgc) + length(tst.ugc)
+  #
+  # dat$epi$rGCasympttests.pos.prep[at] <- length(tst.rgc)
+  # dat$epi$uGCasympttests.pos.prep[at] <- length(tst.ugc)
+  # dat$epi$GCasympttests.pos.prep[at] <- length(tst.rgc.pos) + length(tst.ugc.pos)
+  #
+  # dat$epi$rCTasympttests.prep[at] <- length(tst.rct)
+  # dat$epi$uCTasympttests.prep[at] <- length(tst.uct)
+  # dat$epi$CTasympttests.prep[at] <- length(tst.rct) + length(tst.uct)
+  #
+  # dat$epi$rCTasympttests.pos.prep[at] <- length(tst.rct)
+  # dat$epi$uCTasympttests.pos.prep[at] <- length(tst.uct)
+  # dat$epi$CTasympttests.pos.prep[at] <-
+  #
+  # dat$epi$syphasympttests.prep[at] <- length(tst.syph.prep)
+  # dat$epi$syphasympttests.pos.prep[at] <- length(tst.syph.pos)
+  # dat$epi$syphearlyasympttests.pos.prep[at] <- length(c(tst.earlysyph.pos))
+  # dat$epi$syphlateasympttests.pos.prep[at] <- length(c(tst.latesyph.pos))
+  #
+  # dat$epi$stiasympttests.prep[at] <- length(tst.rgc) + length(tst.ugc) +
+  #   length(tst.rct) + length(tst.uct) + length(tst.syph.prep)
+  # dat$epi$stiasympttests.pos.prep[at] <- length(tst.rgc.pos) + length(tst.ugc.pos) +
+  #   length(tst.rct.pos) + length(tst.uct.pos) + length(tst.syph.pos)
 
   ## Output -------------------------------------------------------------------
 
@@ -300,8 +300,8 @@ prep_msm <- function(dat, at) {
   dat$attr$time.on.prep <- time.on.prep
 
   # Summary Statistics
-  dat$epi$prepCov[at] <- prepCov
-  dat$epi$prepStart[at] <- length(idsStart)
+  # dat$epi$prepCov[at] <- prepCov
+  # dat$epi$prepStart[at] <- length(idsStart)
 
 
 

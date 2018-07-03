@@ -50,7 +50,7 @@ deaths_msm <- function(dat, at) {
 
   dth.all <- NULL
   dth.all <- unique(c(dth.gen, dth.dis))
-  dat$epi$deathage[at] <- mean(c(dat$attr$age[dth.all]))
+  # dat$epi$deathage[at] <- mean(c(dat$attr$age[dth.all]))
 
   if (length(dth.all) > 0) {
     dat$attr$active[dth.all] <- 0
@@ -65,8 +65,8 @@ deaths_msm <- function(dat, at) {
 
 
   ## Summary Output
-  dat$epi$dth.gen[at] <- length(dth.gen)
-  dat$epi$dth.dis[at] <- length(dth.dis)
+  # dat$epi$dth.gen[at] <- length(dth.gen)
+  # dat$epi$dth.dis[at] <- length(dth.dis)
 
   return(dat)
 }

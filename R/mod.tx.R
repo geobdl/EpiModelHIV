@@ -18,7 +18,7 @@
 #'
 #' @return
 #' This function returns the \code{dat} object with updated \code{tx.status},
-#' \code{tx.init.time}, \code{cum.time.on.tx}, 
+#' \code{tx.init.time}, \code{cum.time.on.tx},
 #' \code{cum.time.off.tx} attributes.
 #'
 #' @keywords module msm
@@ -102,9 +102,9 @@ hiv_tx_msm <- function(dat, at) {
                               ((dat$attr$tx.status == 0) %in% TRUE)
 
   ## Summary statistics
-  dat$epi$tx.init.inc[at] <- length(tx.init)
-  dat$epi$tx.halt.inc[at] <- length(tx.halt)
-  dat$epi$tx.resm.inc[at] <- length(tx.reinit)
+  # dat$epi$tx.init.inc[at] <- length(tx.init)
+  # dat$epi$tx.halt.inc[at] <- length(tx.halt)
+  # dat$epi$tx.resm.inc[at] <- length(tx.reinit)
 
   return(dat)
 }

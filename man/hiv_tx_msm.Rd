@@ -14,7 +14,7 @@ individual-level attributes, and summary statistics.}
 }
 \value{
 This function returns the \code{dat} object with updated \code{tx.status},
-\code{tx.init.time}, \code{cum.time.on.tx}, 
+\code{tx.init.time}, \code{cum.time.on.tx},
 \code{cum.time.off.tx} attributes.
 }
 \description{
